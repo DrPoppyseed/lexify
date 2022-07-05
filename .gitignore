@@ -1,0 +1,16 @@
+# Logs
+frontend/pnpm-debug.log*
+
+# Dev dependencies and build files
+frontend/node_modules
+frontend/dist
+backend/target
+
+
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

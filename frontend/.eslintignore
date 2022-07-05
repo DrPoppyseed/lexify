@@ -1,0 +1,9 @@
+# build files
+build
+
+# dependencies
+node_modules
+.pnpm-store
+
+# ignore js, jsx files
+**/*.js

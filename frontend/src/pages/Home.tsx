@@ -1,11 +1,11 @@
 import { AppBar, Grid, styled } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
-import VocabWordCard from "../components/VocabWordCard";
+import VocabCard from "../components/VocabCard/VocabCard";
 import AddVocabWordCard from "../components/AddVocabWordCard";
-import { vocabWordsState } from "../state/vocabWords";
-import { isShakingState } from "../state/isShaking";
+import { vocabWordsState } from "../state/vocabWordsState";
+import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
-import { isDrawerOpenState } from "../state/isDrawerOpen";
+import { isDrawerOpenState } from "../state/pageState";
 import Drawer from "../components/Drawer";
 
 const Home = () => {
@@ -44,7 +44,7 @@ const Home = () => {
         <Grid item xs={10} container spacing={2}>
           {vocabWords.map((id) => (
             <Grid key={id} item xs={12} md={6} xl={4}>
-              <VocabWordCard id={id} />
+              <VocabCard id={id} />
             </Grid>
           ))}
           <Grid item xs={12} md={6} xl={4}>

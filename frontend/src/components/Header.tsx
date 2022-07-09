@@ -1,7 +1,7 @@
 import { IconButton, Toolbar } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useRecoilState } from "recoil";
-import { isDrawerOpenState } from "../state/isDrawerOpen";
+import { isDrawerOpenState } from "../state/pageState";
 
 const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);

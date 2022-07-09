@@ -1,8 +1,8 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { IconButton, styled, SwipeableDrawer } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useRecoilState } from "recoil";
-import { isDrawerOpenState } from "../state/isDrawerOpen";
+import { isDrawerOpenState } from "../state/pageState";
 
 type DrawerProps = {
   width?: number;

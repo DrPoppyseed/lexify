@@ -12,6 +12,7 @@ import { vocabWordState } from "../../state/vocabWordsState";
 import EditableTypography from "../EditableTypography";
 import VocabCardOneSideBase from "./VocabCardOneSideBase";
 import { Sides } from "../../types/Sides";
+import api from "../../config/axios";
 
 type VocabWordCardProps = {
   id: string;
@@ -28,6 +29,11 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
   const [vocabWord, setVocabWord] = useRecoilState(vocabWordState(id));
   const [side, setSide] = useState<Sides>("front");
 
+  const asyncUpdateVocabCard = useMutation((vocabWord: VocabWord) => {
+    const TEMP_collectionId = "temp_collection_id";
+    return api.post(`/collections/${TEMP_collectionId}/words/${id}`, vocabWord);
+  });
+
   const { register, handleSubmit } = useForm<VocabWord>({
     resolver: zodResolver(vocabWordSchema),
     defaultValues: {
@@ -36,12 +42,13 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
   });
 
   const onSubmit: SubmitHandler<VocabWord> = (formData) => {
-    setVocabWord((prevVocabWord) =>
-      produce(prevVocabWord, (draft) => {
-        draft.word = formData.word;
-        draft.definition = formData.definition;
-      })
-    );
+    const updatedVocabCard = produce(vocabWord, (draft) => {
+      draft.word = formData.word;
+      draft.definition = formData.definition;
+    });
+
+    setVocabWord(updatedVocabCard);
+    console.log("updated: ", updatedVocabCard);
   };
 
   const onVocabWordNotKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
@@ -72,11 +79,10 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
             <QuestionMark color="error" />
           </NotKnowsWordButton>
           <EditableTypography
-            text={vocabWord.word}
             onSubmit={() => handleSubmit(onSubmit)()}
             register={register("word")}
             placeholder="Vocabulary word"
-            isWord
+            variant="word"
           />
           <Tally>
             <Typography variant="caption">{vocabWord.fails}</Typography>
@@ -93,7 +99,6 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
           <EditableTypography
             register={register("definition")}
             onSubmit={() => handleSubmit(onSubmit)()}
-            text={vocabWord.definition}
             placeholder="Definition"
           />
         </VocabCardOneSideBase>
@@ -106,9 +111,6 @@ const Tally = styled("div")`
   position: absolute;
   bottom: ${({ theme }) => theme.spacing(4)};
   opacity: 0.5;
-
-  > span {
-  }
 `;
 
 const WordActionArea = css`

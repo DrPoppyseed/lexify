@@ -1,0 +1,27 @@
+CREATE TABLE user (
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE collection (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description text NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY user_idx (user_id)
+);
+
+CREATE TABLE word (
+    id INT NOT NULL AUTO_INCREMENT,
+    collection_id INT NOT NULL,
+    word VARCHAR(255) NOT NULL,
+    definition text,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY collection_idx (collection_id)
+);

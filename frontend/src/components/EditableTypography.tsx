@@ -1,21 +1,25 @@
-import { styled, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { FC, KeyboardEvent } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
+type EditableTypographyVariant =
+  | "word"
+  | "definition"
+  | "title"
+  | "description";
+
 type EditableTypographyProps = {
-  text: string;
   onSubmit: () => void;
   register: UseFormRegisterReturn;
   placeholder?: string;
-  isWord?: boolean;
+  variant?: EditableTypographyVariant;
 };
 
 // Inspired by https://stackoverflow.com/a/1037385/11435461
 const EditableTypography: FC<EditableTypographyProps> = ({
-  text,
   onSubmit,
   register,
-  isWord = false,
+  variant = "definition",
   placeholder,
 }) => {
   let currentTimeout = 0;
@@ -42,19 +46,27 @@ const EditableTypography: FC<EditableTypographyProps> = ({
   };
 
   return (
-    <EditableTypographyBase
+    <TextField
       {...register}
       InputProps={{
         disableUnderline: true,
         inputProps: {
           style: {
-            textAlign: "center",
+            textAlign:
+              variant !== "title" && variant !== "description"
+                ? "center"
+                : "inherit",
+            fontSize: variant === "title" ? 24 : 16,
           },
         },
       }}
       onKeyDown={(e) => {
         if (shouldIgnore(e)) return;
         clearPreviousTimeout();
+
+        if (variant === "title" && e.key === "Enter") {
+          e.preventDefault();
+        }
       }}
       onKeyUp={(e) => {
         if (shouldIgnore(e)) return;
@@ -64,18 +76,16 @@ const EditableTypography: FC<EditableTypographyProps> = ({
         }, 500);
       }}
       onClick={(e) => e.stopPropagation()}
-      sx={{ textDecoration: isWord ? "underline" : "inherit" }}
+      sx={{ textDecoration: variant === "word" ? "underline" : "inherit" }}
       placeholder={placeholder}
       autoFocus
       multiline
-    >
-      {text}
-    </EditableTypographyBase>
+    />
   );
 };
 
-const EditableTypographyBase = styled(TextField)`
-  text-align: center;
-`;
+// const EditableTypographyBase = styled(TextField)`
+//  text-align: center;
+// `;
 
 export default EditableTypography;

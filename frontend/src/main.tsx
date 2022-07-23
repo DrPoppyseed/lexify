@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   createTheme,
@@ -9,6 +10,8 @@ import {
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { RecoilRoot } from "recoil";
 import Home from "./pages/Home";
+
+const queryClient = new QueryClient();
 
 const theme = createTheme({
   palette: {
@@ -41,17 +44,19 @@ const theme = createTheme({
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RecoilRoot>
-      <MuiThemeProvider theme={theme}>
-        <EmotionThemeProvider theme={theme}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-            </Routes>
-          </BrowserRouter>
-          <CssBaseline />
-        </EmotionThemeProvider>
-      </MuiThemeProvider>
-    </RecoilRoot>
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <MuiThemeProvider theme={theme}>
+          <EmotionThemeProvider theme={theme}>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+              </Routes>
+            </BrowserRouter>
+            <CssBaseline />
+          </EmotionThemeProvider>
+        </MuiThemeProvider>
+      </RecoilRoot>
+    </QueryClientProvider>
   </React.StrictMode>
 );

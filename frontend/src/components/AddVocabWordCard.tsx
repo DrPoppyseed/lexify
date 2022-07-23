@@ -9,15 +9,16 @@ import { useCreateVocabWord } from "../state/vocabWordsState";
 const AddVocabWordCard = () => {
   const createVocabWord = useCreateVocabWord();
 
-  const onAddVocabWord = () => {
-    createVocabWord({
-      word: "",
-      definition: "",
-    });
-  };
-
   return (
-    <Card elevation={0} onClick={onAddVocabWord}>
+    <Card
+      elevation={0}
+      onClick={() =>
+        createVocabWord({
+          word: "",
+          definition: "",
+        })
+      }
+    >
       <CardActionArea>
         <Add fontSize="large" color="disabled" />
       </CardActionArea>

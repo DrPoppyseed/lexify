@@ -3,6 +3,23 @@ name = "backend"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+dotenv = "0.15.0"
+serde = "1.0.138"
+serde_json = "1.0.82"
+tokio = "1.19.2"
+futures = "0.3.21"
+log = "0.4.17"
+uuid = "1.1.2"
+jsonwebtoken = "8.1.1"
+
+[dependencies.rocket]
+version = "0.5.0-rc.2"
+features = ["json"]
+
+[dependencies.diesel]
+version = "1.4.8"
+features = [
+  "mysql", 
+  "r2d2"
+]

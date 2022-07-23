@@ -7,6 +7,7 @@ import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
 import { isDrawerOpenState } from "../state/pageState";
 import Drawer from "../components/Drawer";
+import CollectionEditor from "../components/CollectionEditor/CollectionEditor";
 
 const Home = () => {
   const vocabWords = useRecoilValue(vocabWordsState);
@@ -33,25 +34,31 @@ const Home = () => {
         <Header />
       </HeaderWrapper>
       <Drawer width={drawerWidth} />
-      <BodyWrapper
-        isDrawerOpen={isDrawerOpen}
-        drawerWidth={drawerWidth}
-        alignItems="flex-start"
-        container
-      >
-        {/*  body */}
-        <Grid item xs={1} />
-        <Grid item xs={10} container spacing={2}>
-          {vocabWords.map((id) => (
-            <Grid key={id} item xs={12} md={6} xl={4}>
-              <VocabCard id={id} />
-            </Grid>
-          ))}
-          <Grid item xs={12} md={6} xl={4}>
-            <AddVocabWordCard />
+      <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={drawerWidth}>
+        {/*  header */}
+        <CollectionEditorWrapper xs={12} container>
+          <Grid item xs={1} />
+          <Grid item xs={10}>
+            <CollectionEditor />
           </Grid>
+          <Grid item xs={1} />
+        </CollectionEditorWrapper>
+
+        {/*  body */}
+        <Grid xs={12} container>
+          <Grid item xs={1} />
+          <Grid item xs={10} container spacing={2}>
+            {vocabWords.map((id) => (
+              <Grid key={id} item xs={12} md={6} xl={4}>
+                <VocabCard id={id} />
+              </Grid>
+            ))}
+            <Grid item xs={12} md={6} xl={4}>
+              <AddVocabWordCard />
+            </Grid>
+          </Grid>
+          <Grid item xs={1} />
         </Grid>
-        <Grid item xs={1} />
       </BodyWrapper>
     </HomeBase>
   );
@@ -82,7 +89,7 @@ const HeaderWrapper = styled(AppBar, {
     }};
 `;
 
-const BodyWrapper = styled(Grid, {
+const BodyWrapper = styled("div", {
   shouldForwardProp: (props) =>
     props !== "isDrawerOpen" && props !== "drawerWidth",
 })<{ isDrawerOpen: boolean; drawerWidth: number }>`
@@ -90,6 +97,11 @@ const BodyWrapper = styled(Grid, {
   margin-left: -${({ theme, drawerWidth }) => theme.spacing(drawerWidth)};
   flex-grow: 1;
   padding: ${({ theme }) => theme.spacing(4)};
+
+  grid-template-rows: fit-content(100%) fit-content(100%);
+  row-gap: ${({ theme }) => theme.spacing(4)};
+  display: grid;
+
   transition: ${({ theme }) =>
     theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
@@ -103,6 +115,10 @@ const BodyWrapper = styled(Grid, {
       }),
       marginLeft: 0,
     }}
+`;
+
+const CollectionEditorWrapper = styled(Grid)`
+  height: fit-content;
 `;
 
 export default Home;

@@ -1,5 +1,12 @@
+#[macro_use]
+extern crate diesel;
+
+use rocket::{self, get, routes};
+
 use backend::establish_connection_pool;
-use rocket::{self, get, routes, serde::json::Json, State};
+
+mod api;
+mod storage;
 
 #[get("/")]
 fn index() -> &'static str {

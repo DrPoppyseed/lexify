@@ -1,29 +1,31 @@
-use std::error::Error;
+use rocket::{post, routes, serde::json::Json, Route};
 
-use diesel::r2d2::{ConnectionManager, Pool};
-use diesel::MysqlConnection;
-use rocket::serde::json::Json;
-use rocket::{post, routes, Route};
-use serde::Deserialize;
-use serde_json::Value;
+use crate::{
+    http_error::HttpError,
+    lib,
+    storage::mysql::{Collection, StorageError},
+};
 
 pub fn routes() -> Vec<Route> {
-    routes! {
-      create_collection
+    routes![create_collection]
+}
+
+impl From<StorageError> for HttpError {
+    fn from(e: StorageError) -> Self {
+        match e {
+            StorageError::NotFoundError(_) => Self::not_found(),
+            StorageError::DatabaseError(_) => Self::internal_error(),
+        }
     }
 }
 
-#[derive(Deserialize)]
-struct Collection {
-    id: String,
-    name: String,
-    description: String,
-}
-
 #[post("/collections", data = "<collection>")]
-pub fn create_collection(
+pub async fn create_collection(
     collection: Json<Collection>,
-    pool: Pool<ConnectionManager<MysqlConnection>>,
-) -> Result<Value, Box<dyn Error>> {
-    let pool = pool.get();
+    conn: lib::DbConn,
+) -> Result<(), HttpError> {
+    Collection::insert_collection(conn, collection.into_inner())
+        .await
+        .map(|_| ())
+        .map_err(HttpError::from)
 }

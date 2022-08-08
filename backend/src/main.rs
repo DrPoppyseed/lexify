@@ -1,11 +1,12 @@
 #[macro_use]
 extern crate diesel;
 
-use rocket::{self, get, routes};
-
-use backend::establish_connection_pool;
+use crate::api::collection;
+use rocket::{get, routes};
 
 mod api;
+mod http_error;
+mod lib;
 mod storage;
 
 #[get("/")]
@@ -15,11 +16,10 @@ fn index() -> &'static str {
 
 #[rocket::main]
 async fn main() {
-    let connection_pool = establish_connection_pool();
-
     rocket::build()
         .mount("/", routes![index])
-        .manage(connection_pool)
+        .mount("/collections", collection::routes())
+        .attach(lib::DbConn::fairing())
         .launch()
         .await
         .ok();

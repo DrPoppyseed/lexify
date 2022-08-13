@@ -1,20 +1,27 @@
 import { AppBar, Grid, styled } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 import VocabCard from "../components/VocabCard/VocabCard";
-import AddVocabWordCard from "../components/AddVocabWordCard";
+import AddVocabWordCard from "../components/VocabCard/AddVocabWordCard";
 import { vocabWordsState } from "../state/vocabWordsState";
 import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
 import { isDrawerOpenState } from "../state/pageState";
-import Drawer from "../components/Drawer";
+import Drawer from "../components/Drawer/Drawer";
 import CollectionEditor from "../components/CollectionEditor/CollectionEditor";
 
 const Home = () => {
   const vocabWords = useRecoilValue(vocabWordsState);
+  const params = useParams();
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const [isShaking, setIsShaking] = useRecoilState(isShakingState);
 
   const drawerWidth = 30;
+
+  useEffect(() => {
+    console.log("params: ", params);
+  }, [params]);
 
   return (
     <HomeBase
@@ -39,7 +46,11 @@ const Home = () => {
         <CollectionEditorWrapper xs={12} container>
           <Grid item xs={1} />
           <Grid item xs={10}>
-            <CollectionEditor />
+            {params.id ? (
+              <CollectionEditor id={params.id} />
+            ) : (
+              <div>404 Page not found</div>
+            )}
           </Grid>
           <Grid item xs={1} />
         </CollectionEditorWrapper>

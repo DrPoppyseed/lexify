@@ -1,20 +1,14 @@
 use chrono::NaiveDateTime;
 use diesel::{
-    r2d2,
-    r2d2::{ConnectionManager, Pool, PooledConnection},
-    result::Error,
     Connection,
     Insertable,
     MysqlConnection,
-    QueryDsl,
     Queryable,
+    QueryDsl,
+    r2d2,
+    r2d2::{ConnectionManager, Pool, PooledConnection},
+    result::Error,
     RunQueryDsl,
-};
-use rocket::{
-    http::Status,
-    request::{FromRequest, Outcome},
-    Request,
-    State,
 };
 use serde::{Deserialize, Serialize};
 
@@ -22,25 +16,25 @@ use crate::{
     lib,
     storage::{
         mysql::StorageError::DatabaseError,
-        schema::{self, collections, users, vocab_words},
+        schema::{collections, users, vocab_words},
     },
 };
 
 #[derive(Queryable, Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "collections"]
 pub struct Collection {
-    id:          i32,
-    user_id:     i32,
-    name:        String,
+    id: i32,
+    user_id: i32,
+    name: String,
     description: Option<String>,
-    created_at:  NaiveDateTime,
-    updated_at:  NaiveDateTime,
+    created_at: NaiveDateTime,
+    updated_at: NaiveDateTime,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "users"]
 pub struct User {
-    id:         i32,
+    id: i32,
     created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
 }
@@ -48,14 +42,14 @@ pub struct User {
 #[derive(Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "vocab_words"]
 pub struct Word {
-    id:            i32,
+    id: i32,
     collection_id: i32,
-    word:          String,
-    definition:    Option<String>,
-    created_at:    NaiveDateTime,
-    updated_at:    NaiveDateTime,
-    fails:         i32,
-    success:       i32,
+    word: String,
+    definition: Option<String>,
+    created_at: NaiveDateTime,
+    updated_at: NaiveDateTime,
+    fails: i32,
+    success: i32,
 }
 
 #[derive(Debug)]
@@ -126,8 +120,8 @@ impl Collection {
                 .values(&new_collection)
                 .execute(c)
         })
-        .await
-        .map_err(StorageError::from)
+            .await
+            .map_err(StorageError::from)
     }
 
     pub fn get_collection(
@@ -136,7 +130,7 @@ impl Collection {
     ) -> Result<Self, StorageError> {
         connect(pool).and_then(|conn| {
             conn.transaction(|| {
-                schema::collections::dsl::collections
+                collections::dsl::collections
                     .find(collection_id)
                     .get_result::<Collection>(&conn)
                     .map_err(StorageError::from)

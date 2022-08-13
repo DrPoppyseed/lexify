@@ -30,9 +30,6 @@ const theme = createTheme({
     },
   },
   spacing: 8,
-  typography: {
-    fontFamily: ['"Libre Baskerville"', "Arial"].join(","),
-  },
   components: {
     MuiTextField: {
       defaultProps: {
@@ -50,7 +47,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <EmotionThemeProvider theme={theme}>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="c">
+                  <Route index element={<div>No note</div>} />
+                  <Route path=":id" element={<Home />} />
+                </Route>
+                <Route path="*" element={<div>Default home</div>} />
               </Routes>
             </BrowserRouter>
             <CssBaseline />

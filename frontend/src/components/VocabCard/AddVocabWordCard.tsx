@@ -4,7 +4,7 @@ import {
   styled,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { useCreateVocabWord } from "../state/vocabWordsState";
+import { useCreateVocabWord } from "../../state/vocabWordsState";
 
 const AddVocabWordCard = () => {
   const createVocabWord = useCreateVocabWord();

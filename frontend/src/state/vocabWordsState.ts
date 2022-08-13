@@ -27,7 +27,7 @@ export const useCreateVocabWord = () =>
         set(vocabWordsState, (currVal) => [...currVal, id]);
         set(vocabWordState(id), {
           ...vocabWord,
-          id: nanoid(),
+          id,
           fails: 0,
           successes: 0,
         });

@@ -2,25 +2,36 @@ import { TextField } from "@mui/material";
 import { FC, KeyboardEvent } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
-type EditableTypographyVariant =
-  | "word"
-  | "definition"
-  | "title"
-  | "description";
+type TextAlign =
+  | "center"
+  | "end"
+  | "justify"
+  | "left"
+  | "match-parent"
+  | "right"
+  | "start";
 
-type EditableTypographyProps = {
+type TextDecoration = "underline" | "inherit";
+
+export type EditableTypographyBaseProps = {
   onSubmit: () => void;
   register: UseFormRegisterReturn;
   placeholder?: string;
-  variant?: EditableTypographyVariant;
+  textAlign?: TextAlign;
+  fontSize?: number;
+  textDecoration?: TextDecoration;
+  enableEnter?: boolean;
 };
 
 // Inspired by https://stackoverflow.com/a/1037385/11435461
-const EditableTypography: FC<EditableTypographyProps> = ({
+const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
   onSubmit,
   register,
-  variant = "definition",
+  textAlign = "inherit" as const,
   placeholder,
+  fontSize = 16,
+  textDecoration = "inherit",
+  enableEnter = true,
 }) => {
   let currentTimeout = 0;
 
@@ -52,11 +63,8 @@ const EditableTypography: FC<EditableTypographyProps> = ({
         disableUnderline: true,
         inputProps: {
           style: {
-            textAlign:
-              variant !== "title" && variant !== "description"
-                ? "center"
-                : "inherit",
-            fontSize: variant === "title" ? 24 : 16,
+            textAlign,
+            fontSize,
           },
         },
       }}
@@ -64,7 +72,7 @@ const EditableTypography: FC<EditableTypographyProps> = ({
         if (shouldIgnore(e)) return;
         clearPreviousTimeout();
 
-        if (variant === "title" && e.key === "Enter") {
+        if (enableEnter && e.key === "Enter") {
           e.preventDefault();
         }
       }}
@@ -76,7 +84,7 @@ const EditableTypography: FC<EditableTypographyProps> = ({
         }, 500);
       }}
       onClick={(e) => e.stopPropagation()}
-      sx={{ textDecoration: variant === "word" ? "underline" : "inherit" }}
+      sx={{ textDecoration }}
       placeholder={placeholder}
       autoFocus
       multiline
@@ -88,4 +96,4 @@ const EditableTypography: FC<EditableTypographyProps> = ({
 //  text-align: center;
 // `;
 
-export default EditableTypography;
+export default EditableTypographyBase;

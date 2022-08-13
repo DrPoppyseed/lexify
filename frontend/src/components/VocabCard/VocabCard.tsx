@@ -9,10 +9,12 @@ import produce from "immer";
 import VocabCardFlipperBase from "./VocabCardFlipperBase";
 import type { VocabWord } from "../../types/VocabWord";
 import { vocabWordState } from "../../state/vocabWordsState";
-import EditableTypography from "../EditableTypography";
 import VocabCardOneSideBase from "./VocabCardOneSideBase";
 import { Sides } from "../../types/Sides";
-import api from "../../config/axios";
+import {
+  EditableDefinition,
+  EditableWord,
+} from "../EditableTypography/EditableTypography";
 
 type VocabWordCardProps = {
   id: string;
@@ -29,10 +31,10 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
   const [vocabWord, setVocabWord] = useRecoilState(vocabWordState(id));
   const [side, setSide] = useState<Sides>("front");
 
-  const asyncUpdateVocabCard = useMutation((vocabWord: VocabWord) => {
-    const TEMP_collectionId = "temp_collection_id";
-    return api.post(`/collections/${TEMP_collectionId}/words/${id}`, vocabWord);
-  });
+  // const asyncUpdateVocabCard = useMutation((vocabWord: VocabWord) => {
+  //   const TEMP_collectionId = "temp_collection_id";
+  //   return api.post(`/collections/${TEMP_collectionId}/words/${id}`, vocabWord);
+  // });
 
   const { register, handleSubmit } = useForm<VocabWord>({
     resolver: zodResolver(vocabWordSchema),
@@ -78,11 +80,9 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
           <NotKnowsWordButton onClick={onVocabWordNotKnownClicked}>
             <QuestionMark color="error" />
           </NotKnowsWordButton>
-          <EditableTypography
+          <EditableWord
             onSubmit={() => handleSubmit(onSubmit)()}
             register={register("word")}
-            placeholder="Vocabulary word"
-            variant="word"
           />
           <Tally>
             <Typography variant="caption">{vocabWord.fails}</Typography>
@@ -96,10 +96,9 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
       }
       back={
         <VocabCardOneSideBase setSide={setSide}>
-          <EditableTypography
+          <EditableDefinition
             register={register("definition")}
             onSubmit={() => handleSubmit(onSubmit)()}
-            placeholder="Definition"
           />
         </VocabCardOneSideBase>
       }

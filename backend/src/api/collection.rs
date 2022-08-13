@@ -1,4 +1,4 @@
-use rocket::{post, routes, serde::json::Json, Route};
+use rocket::{post, Route, routes, serde::json::Json};
 
 use crate::{
     http_error::HttpError,

@@ -1,10 +1,12 @@
 #[macro_use]
 extern crate diesel;
 
-use crate::api::collection;
 use rocket::{get, routes};
 
+use crate::api::collection;
+
 mod api;
+mod auth;
 mod http_error;
 mod lib;
 mod storage;

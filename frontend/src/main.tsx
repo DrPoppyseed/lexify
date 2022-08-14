@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   createTheme,
   CssBaseline,
@@ -9,7 +8,8 @@ import {
 } from "@mui/material";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { RecoilRoot } from "recoil";
-import Home from "./pages/Home";
+import App from "./App";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -45,16 +45,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <RecoilRoot>
         <MuiThemeProvider theme={theme}>
           <EmotionThemeProvider theme={theme}>
-            <BrowserRouter>
-              <Routes>
-                <Route path="c">
-                  <Route index element={<div>No note</div>} />
-                  <Route path=":id" element={<Home />} />
-                </Route>
-                <Route path="*" element={<div>Default home</div>} />
-              </Routes>
-            </BrowserRouter>
-            <CssBaseline />
+            <AuthProvider>
+              <CssBaseline />
+              <App />
+            </AuthProvider>
           </EmotionThemeProvider>
         </MuiThemeProvider>
       </RecoilRoot>

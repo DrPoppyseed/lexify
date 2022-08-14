@@ -45,6 +45,7 @@
     "@rollup/plugin-image": "^2.1.1",
     "@tanstack/react-query": "^4.0.10",
     "axios": "^0.27.2",
+    "firebase": "^9.9.2",
     "immer": "^9.0.15",
     "nanoid": "^4.0.0",
     "react": "^18.2.0",

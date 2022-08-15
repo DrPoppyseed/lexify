@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -37,21 +37,34 @@ const theme = createTheme({
       },
     },
   },
+  typography: {
+    h3: {
+      color: "#111111",
+    },
+    h6: {
+      color: "#111111",
+    },
+    body1: {
+      color: "#111111",
+    },
+  },
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RecoilRoot>
-        <MuiThemeProvider theme={theme}>
-          <EmotionThemeProvider theme={theme}>
-            <AuthProvider>
-              <CssBaseline />
-              <App />
-            </AuthProvider>
-          </EmotionThemeProvider>
-        </MuiThemeProvider>
-      </RecoilRoot>
+      <Suspense fallback={<div />}>
+        <AuthProvider>
+          <RecoilRoot>
+            <MuiThemeProvider theme={theme}>
+              <EmotionThemeProvider theme={theme}>
+                <CssBaseline />
+                <App />
+              </EmotionThemeProvider>
+            </MuiThemeProvider>
+          </RecoilRoot>
+        </AuthProvider>
+      </Suspense>
     </QueryClientProvider>
   </React.StrictMode>
 );

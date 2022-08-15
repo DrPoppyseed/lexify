@@ -5,15 +5,14 @@ import { AuthContext } from "./contexts/AuthContext";
 const Collections = lazy(() => import("./pages/Collections"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
-const Loading = lazy(() => import("./pages/Loading"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
 const Home = lazy(() => import("./pages/Home"));
 
 const App = () => {
-  const { currentUser, globalLoading } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
-  return !globalLoading ? (
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/">
@@ -25,8 +24,6 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-  ) : (
-    <Loading />
   );
 };
 

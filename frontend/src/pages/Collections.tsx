@@ -33,7 +33,6 @@ const Collections = () => {
     >
       <HeaderWrapper
         position="fixed"
-        color="inherit"
         elevation={0}
         isDrawerOpen={isDrawerOpen}
         drawerWidth={drawerWidth}

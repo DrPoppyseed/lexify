@@ -1,13 +1,13 @@
 use chrono::NaiveDateTime;
 use diesel::{
-    Connection,
-    Insertable,
-    MysqlConnection,
-    Queryable,
-    QueryDsl,
     r2d2,
     r2d2::{ConnectionManager, Pool, PooledConnection},
     result::Error,
+    Connection,
+    Insertable,
+    MysqlConnection,
+    QueryDsl,
+    Queryable,
     RunQueryDsl,
 };
 use serde::{Deserialize, Serialize};
@@ -16,25 +16,30 @@ use crate::{
     lib,
     storage::{
         mysql::StorageError::DatabaseError,
-        schema::{collections, users, vocab_words},
+        schema::{
+            collections,
+            collections::dsl::collections,
+            users,
+            vocab_words,
+        },
     },
 };
 
-#[derive(Queryable, Insertable, Serialize, Deserialize, Debug)]
+#[derive(AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "collections"]
 pub struct Collection {
-    id: i32,
-    user_id: i32,
-    name: String,
-    description: Option<String>,
-    created_at: NaiveDateTime,
-    updated_at: NaiveDateTime,
+    pub id:          String,
+    pub user_id:     Option<String>,
+    pub name:        String,
+    pub description: Option<String>,
+    pub created_at:  NaiveDateTime,
+    pub updated_at:  NaiveDateTime,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "users"]
 pub struct User {
-    id: i32,
+    id:         String,
     created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
 }
@@ -42,14 +47,14 @@ pub struct User {
 #[derive(Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "vocab_words"]
 pub struct Word {
-    id: i32,
-    collection_id: i32,
-    word: String,
-    definition: Option<String>,
-    created_at: NaiveDateTime,
-    updated_at: NaiveDateTime,
-    fails: i32,
-    success: i32,
+    id:            String,
+    collection_id: Option<String>,
+    word:          String,
+    definition:    Option<String>,
+    created_at:    NaiveDateTime,
+    updated_at:    NaiveDateTime,
+    fails:         i32,
+    successes:     i32,
 }
 
 #[derive(Debug)]
@@ -120,13 +125,34 @@ impl Collection {
                 .values(&new_collection)
                 .execute(c)
         })
-            .await
-            .map_err(StorageError::from)
+        .await
+        .map_err(StorageError::from)
+    }
+
+    pub async fn update_collection(
+        conn: lib::DbConn,
+        collection: Collection,
+    ) -> Result<usize, StorageError> {
+        conn.run(move |c| {
+            diesel::update(collections::dsl::collections.find(collection.id))
+                // .set(collections::name.eq(collection.name))
+                .set(Collection {
+                    id:          "".to_string(),
+                    user_id:     None,
+                    name:        "".to_string(),
+                    description: None,
+                    created_at:  collection.created_at,
+                    updated_at:  Default::default(),
+                })
+                .execute(c)
+        })
+        .await
+        .map_err(StorageError::from)
     }
 
     pub fn get_collection(
         pool: ConnPool,
-        collection_id: i32,
+        collection_id: String,
     ) -> Result<Self, StorageError> {
         connect(pool).and_then(|conn| {
             conn.transaction(|| {

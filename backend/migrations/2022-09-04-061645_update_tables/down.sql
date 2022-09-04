@@ -1,0 +1,14 @@
+BEGIN;
+
+ALTER TABLE users
+MODIFY COLUMN id INT;
+
+ALTER TABLE collections
+MODIFY COLUMN id INT,
+MODIFY COLUMN user_id INT;
+
+ALTER TABLE vocab_words
+MODIFY COLUMN id INT,
+MODIFY COLUMN collection_id INT;
+
+COMMIT;

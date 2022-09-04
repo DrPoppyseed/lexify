@@ -56,7 +56,7 @@ const Home = () => {
       </HeaderWrapper>
       <Drawer width={drawerWidth} />
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={drawerWidth}>
-        {!currentCollection && !params.id ? (
+        {!params.id && !currentCollection ? (
           <div>id</div>
         ) : (
           <>

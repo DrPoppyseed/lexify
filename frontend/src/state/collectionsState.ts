@@ -48,7 +48,7 @@ export const useCreateCollection = () => {
           description?: string;
         }>("/collection/collections", {
           id,
-          user_id: currentUser,
+          user_id: currentUser?.uid,
           name: "Untitled",
           description: "",
         });

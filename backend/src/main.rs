@@ -3,7 +3,6 @@ extern crate diesel;
 
 use std::str::FromStr;
 
-use rocket::{get, routes};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
 use crate::api::collection;

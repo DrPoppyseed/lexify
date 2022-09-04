@@ -7,9 +7,10 @@ import produce from "immer";
 import { ListItemText, MenuItem } from "@mui/material";
 import { z } from "zod";
 import { collectionState } from "../../state/collectionsState";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const drawerItemSchema = z.object({
-  title: z.string(),
+  name: z.string(),
 });
 
 export type DrawerItemForm = z.infer<typeof drawerItemSchema>;
@@ -17,6 +18,7 @@ export type DrawerItemForm = z.infer<typeof drawerItemSchema>;
 const DrawerItem: FC<{ id: string }> = ({ id }) => {
   const navigate = useNavigate();
   const [collection, setCollection] = useRecoilState(collectionState(id));
+  const { setItemToLocalStorage } = useLocalStorage();
   const { register, handleSubmit } = useForm<DrawerItemForm>({
     resolver: zodResolver(drawerItemSchema),
   });
@@ -24,14 +26,19 @@ const DrawerItem: FC<{ id: string }> = ({ id }) => {
   const onSubmit: SubmitHandler<DrawerItemForm> = (formData) => {
     setCollection((prev) =>
       produce(prev, (draft) => {
-        draft.title = formData.title;
+        draft.name = formData.name;
       })
     );
   };
 
+  const onDrawerItemClick = () => {
+    navigate(`/${collection.id}`);
+    setItemToLocalStorage("latestAccessedCollectionId", collection.id);
+  };
+
   return (
-    <MenuItem onClick={() => navigate(`/c/${collection.id}`)}>
-      <ListItemText primary={collection.title} />
+    <MenuItem onClick={onDrawerItemClick}>
+      <ListItemText primary={collection.name} />
     </MenuItem>
   );
 };

@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate diesel;
 
+use std::str::FromStr;
+
 use rocket::{get, routes};
+use rocket_cors::{AllowedOrigins, CorsOptions};
 
 use crate::api::collection;
 
@@ -11,17 +14,26 @@ mod http_error;
 mod lib;
 mod storage;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[rocket::main]
 async fn main() {
+    let cors = CorsOptions::default()
+        .allowed_origins(AllowedOrigins::all())
+        .allowed_methods(
+            ["Get", "Post", "Patch", "Delete", "Options"]
+                .iter()
+                .map(|s| FromStr::from_str(s).unwrap())
+                .collect(),
+        )
+        .allow_credentials(true)
+        .to_cors()
+        .expect("");
+
     rocket::build()
-        .mount("/", routes![index])
-        .mount("/collections", collection::routes())
+        .mount("/collection/", collection::routes())
+        .mount("/", rocket_cors::catch_all_options_routes())
         .attach(lib::DbConn::fairing())
+        .attach(cors.clone())
+        .manage(cors)
         .launch()
         .await
         .ok();

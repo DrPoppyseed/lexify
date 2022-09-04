@@ -28,6 +28,7 @@ const AddVocabWordCard = () => {
 
 const Card = styled(MuiCard)`
   height: ${(props) => props.theme.spacing(16)};
+  background-color: #fffcf7;
 `;
 
 const CardActionArea = styled(MuiCardActionArea)`

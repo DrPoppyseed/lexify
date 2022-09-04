@@ -10,7 +10,7 @@ import EditableTypographyBase from "../EditableTypography/EditableTypographyBase
 import { collectionState } from "../../state/collectionsState";
 
 const collectionEditorSchema = z.object({
-  title: z.string().max(50),
+  name: z.string().max(50),
   description: z.string(),
 });
 
@@ -21,14 +21,14 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
   const { reset, register, handleSubmit } = useForm<CollectionEditorForm>({
     resolver: zodResolver(collectionEditorSchema),
     defaultValues: {
-      title: collection.title,
+      name: collection.name,
       description: collection.description,
     },
   });
 
   useEffect(() => {
     reset({
-      title: collection.title,
+      name: collection.name,
       description: collection.description,
     });
   }, [reset, id]);
@@ -36,7 +36,7 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
   const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
     setCollection((prev) =>
       produce(prev, (draft) => {
-        draft.title = formData.title;
+        draft.name = formData.name;
         draft.description = formData.description;
       })
     );
@@ -46,7 +46,7 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
     <CollectionEditorBase>
       <EditableTitle
         onSubmit={() => handleSubmit(onSubmit)()}
-        register={register("title")}
+        register={register("name")}
         // placeholder={collection.title}
       />
       <EditableTypographyBase

@@ -1,8 +1,8 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import React, { lazy, useContext } from "react";
-import { AuthContext } from "./contexts/AuthContext";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import React, {lazy, useContext} from "react";
+import {AuthContext} from "./contexts/AuthContext"; // const Home = lazy(() => import("./pages/Home"));
 
-const Collections = lazy(() => import("./pages/Collections"));
+// const Home = lazy(() => import("./pages/Home"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -10,16 +10,18 @@ const Login = lazy(() => import("./pages/Login"));
 const Home = lazy(() => import("./pages/Home"));
 
 const App = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, globalLoading } = useContext(AuthContext);
 
-  return (
+  return globalLoading ? (
+    <div>Loading!</div>
+  ) : (
     <BrowserRouter>
       <Routes>
         <Route path="/">
           <Route index element={currentUser ? <Home /> : <Landing />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path=":id" element={<Collections />} />
+          <Route path=":id" element={<Home />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

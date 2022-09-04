@@ -49,6 +49,7 @@ const VocabCardOneSideBase: FC<VocabCardOneSideBaseProps> = ({
 };
 
 const CardBase = styled(Card)`
+  background-color: #fffcf7;
   display: flex;
   align-items: center;
   justify-content: center;

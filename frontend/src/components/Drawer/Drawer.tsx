@@ -25,7 +25,6 @@ const Drawer: FC<DrawerProps> = ({ width = 30 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const collections = useRecoilValue(collectionsState);
   const createCollection = useCreateCollection();
-
   const onClickCreateCollection = () => {
     createCollection();
     console.log("yo whats up: ", collections[collections.length - 1]);
@@ -69,6 +68,7 @@ const DrawerBase = styled(SwipeableDrawer)<{ width: number }>`
     padding: 0 ${({ theme }) => theme.spacing(2)}
       ${({ theme }) => theme.spacing(2)};
     box-sizing: border-box;
+    background-color: #fffcf7;
   }
 `;
 

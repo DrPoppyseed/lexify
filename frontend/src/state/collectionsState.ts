@@ -1,6 +1,10 @@
 import { atom, atomFamily, useRecoilCallback } from "recoil";
 import { nanoid } from "nanoid";
 import { Collection } from "../types/Collection";
+import { useNavigate } from "react-router-dom";
+import { api } from "../config/axios";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 export const collectionsState = atom<ReadonlyArray<string>>({
   key: "collections",
@@ -11,25 +15,47 @@ export const collectionState = atomFamily<Collection, string>({
   key: "collection",
   default: {
     id: nanoid(),
-    title: "Untitled",
+    name: "Untitled",
     description: "",
   },
 });
 
-export const useCreateCollection = () =>
-  useRecoilCallback(
+export const currentCollectionState = atom<Readonly<string | null>>({
+  key: "currentCollection",
+  default: null,
+});
+
+export const useCreateCollection = () => {
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+
+  return useRecoilCallback(
     ({ set }) =>
-      () => {
+      async () => {
         const id = nanoid();
         set(collectionsState, (currVal) => [...currVal, id]);
         set(collectionState(id), {
           id,
-          title: "Untitled",
+          name: "Untitled",
+          description: "",
+        });
+        navigate(`/${id}`);
+        console.log("baseUrl: ", import.meta.env.VITE_BASE_URL);
+        await api.post<{
+          id: number;
+          user_id: number;
+          name: string;
+          description?: string;
+        }>("/collection/collections", {
+          id,
+          user_id: currentUser,
+          name: "Untitled",
           description: "",
         });
       },
     []
   );
+};
 
 export const useRemoveCollection = () =>
   useRecoilCallback(({ set, reset }) => (id: string) => {

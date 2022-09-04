@@ -1,10 +1,10 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import React, {lazy, useContext} from "react";
-import {AuthContext} from "./contexts/AuthContext"; // const Home = lazy(() => import("./pages/Home"));
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React, { lazy, useContext } from "react";
+import { AuthContext } from "./contexts/AuthContext";
 
-// const Home = lazy(() => import("./pages/Home"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
+const Loading = lazy(() => import("./pages/Loading"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
 const Home = lazy(() => import("./pages/Home"));
@@ -13,7 +13,7 @@ const App = () => {
   const { currentUser, globalLoading } = useContext(AuthContext);
 
   return globalLoading ? (
-    <div>Loading!</div>
+    <Loading />
   ) : (
     <BrowserRouter>
       <Routes>

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../config/axios";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export const collectionsState = atom<ReadonlyArray<string>>({
   key: "collections",
@@ -27,7 +28,7 @@ export const currentCollectionState = atom<Readonly<string | null>>({
 
 export const useCreateCollection = () => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
+  const { user } = useAuth();
 
   return useRecoilCallback(
     ({ set }) =>
@@ -48,7 +49,7 @@ export const useCreateCollection = () => {
           description?: string;
         }>("/collection/collections", {
           id,
-          user_id: currentUser?.uid,
+          user_id: user?.uid,
           name: "Untitled",
           description: "",
         });

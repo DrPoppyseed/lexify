@@ -1,13 +1,5 @@
-use std::str::FromStr;
-
-use chrono::{NaiveDateTime, Utc};
-use rocket::{
-    http::ext::IntoCollection,
-    post,
-    routes,
-    serde::json::Json,
-    Route,
-};
+use chrono::Utc;
+use rocket::{post, routes, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
 use crate::{http_error::HttpError, lib, storage::mysql};
@@ -22,15 +14,6 @@ pub struct Collection {
     pub user_id:     Option<String>,
     pub name:        String,
     pub description: Option<String>,
-}
-
-impl From<mysql::StorageError> for HttpError {
-    fn from(e: mysql::StorageError) -> Self {
-        match e {
-            mysql::StorageError::NotFoundError(_) => Self::not_found(),
-            mysql::StorageError::DatabaseError(_) => Self::internal_error(),
-        }
-    }
 }
 
 #[post("/collections", data = "<collection>")]

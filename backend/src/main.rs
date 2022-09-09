@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
-use crate::api::collection;
+use crate::api::{collection, user};
 
 mod api;
 mod auth;
@@ -28,6 +28,7 @@ async fn main() {
         .expect("");
 
     rocket::build()
+        .mount("/user/", user::routes())
         .mount("/collection/", collection::routes())
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(lib::DbConn::fairing())

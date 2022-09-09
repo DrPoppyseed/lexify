@@ -1,11 +1,9 @@
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use diesel::{
     r2d2,
-    r2d2::{ConnectionManager, Pool, PooledConnection},
     result::Error,
-    Connection,
     Insertable,
-    MysqlConnection,
+    OptionalExtension,
     QueryDsl,
     Queryable,
     RunQueryDsl,
@@ -16,12 +14,7 @@ use crate::{
     lib,
     storage::{
         mysql::StorageError::DatabaseError,
-        schema::{
-            collections,
-            collections::dsl::collections,
-            users,
-            vocab_words,
-        },
+        schema::{collections, users, vocab_words},
     },
 };
 
@@ -36,25 +29,25 @@ pub struct Collection {
     pub updated_at:  NaiveDateTime,
 }
 
-#[derive(Insertable, Serialize, Deserialize, Debug)]
+#[derive(Queryable, Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "users"]
 pub struct User {
-    id:         String,
-    created_at: NaiveDateTime,
-    updated_at: NaiveDateTime,
+    pub id:         String,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "vocab_words"]
 pub struct Word {
-    id:            String,
-    collection_id: Option<String>,
-    word:          String,
-    definition:    Option<String>,
-    created_at:    NaiveDateTime,
-    updated_at:    NaiveDateTime,
-    fails:         i32,
-    successes:     i32,
+    pub id:            String,
+    pub collection_id: Option<String>,
+    pub word:          String,
+    pub definition:    Option<String>,
+    pub created_at:    NaiveDateTime,
+    pub updated_at:    NaiveDateTime,
+    pub fails:         i32,
+    pub successes:     i32,
 }
 
 #[derive(Debug)]
@@ -78,43 +71,6 @@ impl From<r2d2::PoolError> for StorageError {
     }
 }
 
-pub type ConnPool = Pool<ConnectionManager<MysqlConnection>>;
-
-// pub struct Conn(pub PooledConnection<ConnectionManager<MysqlConnection>>);
-
-// #[rocket::async_trait]
-// impl<'r> FromRequest<'r> for Conn {
-//     type Error = ();
-//
-//     async fn from_request(
-//         request: &'r Request<'_>,
-//     ) -> Outcome<Self, Self::Error> {
-//         // let pool = request.guard::<State<ConnPool>>().await.unwrap();
-//         // let pool = request.guard().await;
-//         // match pool.get() {
-//         //     Ok(conn) => Outcome::Success(Conn(conn)),
-//         //     Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
-//         // }
-//         match request.guard().await {
-//             Outcome::Success(c) => Outcome::Success(Conn(c)),
-//         }
-//     }
-// }
-//
-// impl Deref for Conn {
-//     type Target = MysqlConnection;
-//     fn deref(&self) -> &Self::Target {
-//         &self.0
-//     }
-// }
-
-pub fn connect(
-    pool: ConnPool,
-) -> Result<PooledConnection<ConnectionManager<MysqlConnection>>, StorageError>
-{
-    pool.get().map_err(StorageError::from)
-}
-
 impl Collection {
     pub async fn insert_collection(
         conn: lib::DbConn,
@@ -133,34 +89,55 @@ impl Collection {
         conn: lib::DbConn,
         collection: Collection,
     ) -> Result<usize, StorageError> {
+        let updated_at = Utc::now().naive_utc();
+
         conn.run(move |c| {
-            diesel::update(collections::dsl::collections.find(collection.id))
-                // .set(collections::name.eq(collection.name))
-                .set(Collection {
-                    id:          "".to_string(),
-                    user_id:     None,
-                    name:        "".to_string(),
-                    description: None,
-                    created_at:  collection.created_at,
-                    updated_at:  Default::default(),
-                })
-                .execute(c)
+            diesel::update(
+                collections::dsl::collections.find(collection.id.clone()),
+            )
+            .set(Collection {
+                updated_at,
+                ..collection
+            })
+            .execute(c)
         })
         .await
         .map_err(StorageError::from)
     }
 
-    pub fn get_collection(
-        pool: ConnPool,
+    pub async fn get_collection(
+        conn: lib::DbConn,
         collection_id: String,
-    ) -> Result<Self, StorageError> {
-        connect(pool).and_then(|conn| {
-            conn.transaction(|| {
-                collections::dsl::collections
-                    .find(collection_id)
-                    .get_result::<Collection>(&conn)
-                    .map_err(StorageError::from)
-            })
+    ) -> Result<Collection, StorageError> {
+        conn.run(move |c| {
+            collections::dsl::collections.find(collection_id).first(c)
         })
+        .await
+        .map_err(StorageError::from)
+    }
+}
+
+impl User {
+    pub async fn insert_user(
+        conn: &lib::DbConn,
+        new_user: User,
+    ) -> Result<User, StorageError> {
+        conn.run(move |c| {
+            diesel::insert_into(users::table)
+                .values(&new_user)
+                .execute(c)
+                .map(|_| new_user)
+        })
+        .await
+        .map_err(StorageError::from)
+    }
+
+    pub async fn get_user(
+        conn: &lib::DbConn,
+        user_id: String,
+    ) -> Result<Option<User>, StorageError> {
+        conn.run(move |c| users::dsl::users.find(user_id).first(c).optional())
+            .await
+            .map_err(StorageError::from)
     }
 }

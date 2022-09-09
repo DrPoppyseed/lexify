@@ -8,20 +8,28 @@ const Loading = lazy(() => import("./pages/Loading"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
 const Home = lazy(() => import("./pages/Home"));
+const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
 
 const App = () => {
-  const { currentUser, globalLoading } = useContext(AuthContext);
+  const { user, authLoading } = useContext(AuthContext);
 
-  return globalLoading ? (
+  return authLoading ? (
     <Loading />
   ) : (
     <BrowserRouter>
       <Routes>
         <Route path="/">
-          <Route index element={currentUser ? <Home /> : <Landing />} />
+          <Route index element={user ? <Home /> : <Landing />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path=":id" element={<Home />} />
+          <Route
+            path=":id"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,7 +1,10 @@
+use std::ops::Deref;
+
 use chrono::{NaiveDateTime, Utc};
 use diesel::{
     r2d2,
     result::Error,
+    Connection,
     Insertable,
     OptionalExtension,
     QueryDsl,
@@ -11,11 +14,11 @@ use diesel::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lib,
-    storage::{
+    db::{
         mysql::StorageError::DatabaseError,
         schema::{collections, users, vocab_words},
     },
+    rocket_launch::DbPool,
 };
 
 #[derive(AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug)]
@@ -73,25 +76,27 @@ impl From<r2d2::PoolError> for StorageError {
 
 impl Collection {
     pub async fn insert_collection(
-        conn: lib::DbConn,
+        pool: &DbPool,
         new_collection: Collection,
     ) -> Result<usize, StorageError> {
-        conn.run(move |c| {
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
             diesel::insert_into(collections::table)
                 .values(&new_collection)
-                .execute(c)
+                .execute(pool.deref())
         })
-        .await
         .map_err(StorageError::from)
     }
 
     pub async fn update_collection(
-        conn: lib::DbConn,
+        pool: &DbPool,
         collection: Collection,
     ) -> Result<usize, StorageError> {
+        let pool = pool.get()?;
         let updated_at = Utc::now().naive_utc();
 
-        conn.run(move |c| {
+        pool.transaction(|| {
             diesel::update(
                 collections::dsl::collections.find(collection.id.clone()),
             )
@@ -99,45 +104,69 @@ impl Collection {
                 updated_at,
                 ..collection
             })
-            .execute(c)
+            .execute(pool.deref())
         })
-        .await
         .map_err(StorageError::from)
     }
 
     pub async fn get_collection(
-        conn: lib::DbConn,
+        pool: &DbPool,
         collection_id: String,
     ) -> Result<Collection, StorageError> {
-        conn.run(move |c| {
-            collections::dsl::collections.find(collection_id).first(c)
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
+            collections::dsl::collections
+                .find(collection_id)
+                .first(pool.deref())
         })
-        .await
         .map_err(StorageError::from)
     }
 }
 
 impl User {
     pub async fn insert_user(
-        conn: &lib::DbConn,
+        pool: &DbPool,
         new_user: User,
     ) -> Result<User, StorageError> {
-        conn.run(move |c| {
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
             diesel::insert_into(users::table)
                 .values(&new_user)
-                .execute(c)
+                .execute(pool.deref())
                 .map(|_| new_user)
         })
-        .await
         .map_err(StorageError::from)
     }
 
     pub async fn get_user(
-        conn: &lib::DbConn,
+        pool: &DbPool,
         user_id: String,
     ) -> Result<Option<User>, StorageError> {
-        conn.run(move |c| users::dsl::users.find(user_id).first(c).optional())
-            .await
-            .map_err(StorageError::from)
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
+            users::dsl::users
+                .find(user_id)
+                .first(pool.deref())
+                .optional()
+        })
+        .map_err(StorageError::from)
+    }
+
+    pub async fn get_user_pooled(
+        pool: &DbPool,
+        user_id: String,
+    ) -> Result<Option<User>, StorageError> {
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
+            users::dsl::users
+                .find(user_id)
+                .first(pool.deref())
+                .optional()
+        })
+        .map_err(StorageError::from)
     }
 }

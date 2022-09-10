@@ -1,0 +1,15 @@
+.dockerignore
+Dockerfile
+
+# unrelated directories
+migrations/
+scripts/
+
+# builds and logs
+target/
+
+# environment
+.idea/
+.env
+Rocket.toml
+rustfmt.toml

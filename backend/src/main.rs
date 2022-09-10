@@ -1,40 +1,7 @@
-#[macro_use]
-extern crate diesel;
-
-use std::str::FromStr;
-
-use rocket_cors::{AllowedOrigins, CorsOptions};
-
-use crate::api::{collection, user};
-
-mod api;
-mod auth;
-mod http_error;
-mod lib;
-mod storage;
+use lexify_api::rocket_launch::{establish_connection_pool, rocket_launch};
 
 #[rocket::main]
 async fn main() {
-    let cors = CorsOptions::default()
-        .allowed_origins(AllowedOrigins::all())
-        .allowed_methods(
-            ["Get", "Post", "Patch", "Delete", "Options"]
-                .iter()
-                .map(|s| FromStr::from_str(s).unwrap())
-                .collect(),
-        )
-        .allow_credentials(true)
-        .to_cors()
-        .expect("");
-
-    rocket::build()
-        .mount("/user/", user::routes())
-        .mount("/collection/", collection::routes())
-        .mount("/", rocket_cors::catch_all_options_routes())
-        .attach(lib::DbConn::fairing())
-        .attach(cors.clone())
-        .manage(cors)
-        .launch()
-        .await
-        .ok();
+    let db_pool = establish_connection_pool(".env");
+    let _server = rocket_launch(db_pool).await;
 }

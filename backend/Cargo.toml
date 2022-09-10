@@ -1,7 +1,18 @@
 [package]
-name = "backend"
+name = "lexify-api"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "lexify-api"
+
+[[test]]
+name = "integration"
+path = "tests/setup.rs"
 
 [dependencies]
 dotenv = "0.15.0"
@@ -12,31 +23,11 @@ futures = "0.3.21"
 log = "0.4.17"
 uuid = "1.1.2"
 jsonwebtoken = "8.1.1"
+rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "54fae0701dffbe5df686465780218644ee3fae5f" }
+diesel = { version = "1.4.8", features = ["r2d2", "mysql", "chrono"] }
+reqwest = { version = "0.11.11", features = ["json"] }
+chrono = { version = "0.4", features = ["serde"] }
+rocket = { version = "0.5.0-rc.1", features = ["json"] }
 
-
-[dependencies.reqwest]
-version = "0.11.11"
-features = ["json"]
-
-[dependencies.chrono]
-version = "0.4"
-features = ["serde"]
-
-[dependencies.rocket]
-version = "0.5.0-rc.1"
-features = ["json"]
-
-[dependencies.rocket_cors]
-git = "https://github.com/lawliet89/rocket_cors"
-rev = "54fae0701dffbe5df686465780218644ee3fae5f"
-
-[dependencies.rocket_sync_db_pools]
-rocket_sync_db_pools = "0.1.0-rc.2"
-features = ["diesel_mysql_pool"]
-
-[dependencies.diesel]
-version = "1.4.8"
-features = [
-    "mysql",
-    "chrono"
-]
+[dev-dependencies]
+wiremock = "0.5.14"

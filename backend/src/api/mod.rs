@@ -1,4 +1,4 @@
-use crate::{http_error::HttpError, storage::mysql};
+use crate::{db::mysql, http_error::HttpError};
 
 pub mod collection;
 pub mod user;

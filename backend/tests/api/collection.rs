@@ -3,11 +3,7 @@ use std::ops::Deref;
 use diesel::{connection::SimpleConnection, Connection, QueryDsl, RunQueryDsl};
 use rocket::http::{ContentType, Status};
 
-use lexify_api::{
-    api::collection,
-    db::{mysql, schema::collections::dsl::collections},
-    rocket_launch::DbPool,
-};
+use lexify_api::{api, db, rocket_launch::DbPool};
 
 use crate::utils::setup;
 
@@ -16,8 +12,8 @@ static COL_ID: &str = "dummy_collection_id";
 static COL_NAME: &str = "dummy_collection_name";
 static COL_DESC: &str = "dummy_collection_description";
 
-async fn before_each(db_pool: &DbPool) -> Result<(), mysql::StorageError> {
-    let conn = db_pool.get().map_err(mysql::StorageError::from)?;
+async fn before_each(db_pool: &DbPool) -> Result<(), db::StorageError> {
+    let conn = db_pool.get().map_err(db::StorageError::from)?;
 
     conn.batch_execute(
         r#"
@@ -42,7 +38,7 @@ async fn create_collection_happy_path() {
     let (db_pool, client, _) = setup().await;
     let _cleanup = before_each(&db_pool).await;
 
-    let req_body = collection::Collection {
+    let req_body = api::Collection {
         id:          COL_ID.to_string(),
         user_id:     USER_ID.to_string(),
         name:        COL_NAME.to_string(),
@@ -62,9 +58,9 @@ async fn create_collection_happy_path() {
     let conn = db_pool.get().unwrap();
     let db = conn
         .transaction(|| {
-            collections
+            db::schema::collections::dsl::collections
                 .find(COL_ID)
-                .load::<mysql::Collection>(conn.deref())
+                .load::<db::Collection>(conn.deref())
         })
         .unwrap();
 

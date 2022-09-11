@@ -5,7 +5,7 @@ use diesel::{
     MysqlConnection,
 };
 use dotenv;
-use rocket::{Ignite, Rocket};
+use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
 
 use crate::api::{collection, user};
@@ -29,7 +29,7 @@ pub fn establish_connection_pool(env_file_name: &str) -> DbPool {
         .expect("Failed to establish database connection pool.")
 }
 
-pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Ignite> {
+pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Build> {
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
@@ -48,7 +48,4 @@ pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Ignite> {
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(cors.clone())
         .manage(ServerState { cors, db_pool })
-        .launch()
-        .await
-        .expect("Failed to ignite rocket server.")
 }

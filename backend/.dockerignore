@@ -1,9 +1,9 @@
 .dockerignore
 Dockerfile
 
-# unrelated directories
+# unrelated files and directories
 migrations/
-scripts/
+how_i_solved_it.md
 
 # builds and logs
 target/

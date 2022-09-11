@@ -11,6 +11,7 @@ pub async fn setup() -> (DbPool, Client, MockServer) {
     let db_pool = establish_connection_pool(".env.test");
 
     let rocket = rocket_launch(db_pool.clone()).await;
+
     let client = Client::untracked(rocket)
         .await
         .expect("Failed to launch local rocket server instance.");

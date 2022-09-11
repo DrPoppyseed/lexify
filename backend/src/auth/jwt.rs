@@ -8,17 +8,8 @@ use jsonwebtoken::{
     Header,
     Validation,
 };
-use serde::{Deserialize, Serialize};
 
-use crate::auth::{firebase_auth::FirebaseConfig, jwk::get_firebase_jwks};
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Jwt {
-    pub aud: String,
-    pub iat: u64,
-    pub exp: u64,
-    pub sub: String,
-}
+use crate::auth::{jwk::get_firebase_jwks, FirebaseConfig, Jwt};
 
 impl Jwt {
     pub fn new(audience: &str, uid: String) -> Self {
@@ -58,7 +49,7 @@ impl Jwt {
             Ok(None) => {
                 return Err(jsonwebtoken::errors::Error::from(
                     ErrorKind::InvalidToken,
-                ))
+                ));
             }
             Err(err) => return Err(err),
         };

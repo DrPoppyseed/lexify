@@ -1,15 +1,8 @@
-use dotenv::dotenv;
-use serde::Deserialize;
 use std::env;
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct FirebaseConfig {
-    pub project_id:     String,
-    pub private_key_id: String,
-    pub private_key:    String,
-    pub client_email:   String,
-    pub client_id:      String,
-}
+use dotenv::dotenv;
+
+use crate::auth::FirebaseConfig;
 
 impl FirebaseConfig {
     pub fn new() -> FirebaseConfig {

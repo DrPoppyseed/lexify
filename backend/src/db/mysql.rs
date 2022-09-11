@@ -25,7 +25,7 @@ use crate::{
 #[table_name = "collections"]
 pub struct Collection {
     pub id:          String,
-    pub user_id:     Option<String>,
+    pub user_id:     String,
     pub name:        String,
     pub description: Option<String>,
     pub created_at:  NaiveDateTime,
@@ -44,7 +44,7 @@ pub struct User {
 #[table_name = "vocab_words"]
 pub struct Word {
     pub id:            String,
-    pub collection_id: Option<String>,
+    pub collection_id: String,
     pub word:          String,
     pub definition:    Option<String>,
     pub created_at:    NaiveDateTime,
@@ -79,14 +79,20 @@ impl Collection {
         pool: &DbPool,
         new_collection: Collection,
     ) -> Result<usize, StorageError> {
-        let pool = pool.get()?;
+        let pool = pool.get().map_err(|e| {
+            println!("[DB][insert_collection] Failed to get database connection from pool: {:#?}", e);
+            StorageError::from(e)
+        })?;
 
         pool.transaction(|| {
             diesel::insert_into(collections::table)
                 .values(&new_collection)
                 .execute(pool.deref())
         })
-        .map_err(StorageError::from)
+        .map_err(|e| {
+            println!("[DB][insert_collection] {:#?}", e);
+            StorageError::from(e)
+        })
     }
 
     pub async fn update_collection(

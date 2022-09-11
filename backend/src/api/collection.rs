@@ -1,5 +1,5 @@
 use chrono::Utc;
-use rocket::{post, routes, serde::json::Json, Route, State};
+use rocket::{http::Status, post, routes, serde::json::Json, Route, State};
 use serde::{Deserialize, Serialize};
 
 use crate::{db::mysql, http_error::HttpError, rocket_launch::ServerState};
@@ -11,7 +11,7 @@ pub fn routes() -> Vec<Route> {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Collection {
     pub id:          String,
-    pub user_id:     Option<String>,
+    pub user_id:     String,
     pub name:        String,
     pub description: Option<String>,
 }
@@ -20,8 +20,9 @@ pub struct Collection {
 pub async fn create_collection(
     collection: Json<Collection>,
     state: &State<ServerState>,
-) -> Result<(), HttpError> {
+) -> Result<Status, HttpError> {
     let created_at = Utc::now().naive_utc();
+    println!("[API][create_collection] function triggered!");
 
     mysql::Collection::insert_collection(
         &state.db_pool,
@@ -35,6 +36,9 @@ pub async fn create_collection(
         },
     )
     .await
-    .map(|_| ())
-    .map_err(HttpError::from)
+    .map(|_| Status::Created)
+    .map_err(|e| {
+        println!("[API][create_collection] {:#?}", e);
+        HttpError::from(e)
+    })
 }

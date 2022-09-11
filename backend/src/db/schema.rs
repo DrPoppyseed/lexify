@@ -1,7 +1,9 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     collections (id) {
         id -> Varchar,
-        user_id -> Nullable<Varchar>,
+        user_id -> Varchar,
         name -> Varchar,
         description -> Nullable<Text>,
         created_at -> Timestamp,
@@ -9,7 +11,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     users (id) {
         id -> Varchar,
         created_at -> Timestamp,
@@ -17,17 +19,17 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     vocab_words (id) {
         id -> Varchar,
-        collection_id -> Nullable<Varchar>,
+        collection_id -> Varchar,
         word -> Varchar,
         definition -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        fails -> Nullable<Integer>,
-        successes -> Nullable<Integer>,
+        fails -> Integer,
+        successes -> Integer,
     }
 }
 
-allow_tables_to_appear_in_same_query!(collections, users, vocab_words,);
+diesel::allow_tables_to_appear_in_same_query!(collections, users, vocab_words,);

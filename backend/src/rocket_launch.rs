@@ -6,7 +6,7 @@ use diesel::{
 };
 use dotenv;
 use rocket::{Build, Rocket};
-use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
+use rocket_cors::{AllowedOrigins, CorsOptions};
 
 use crate::api::{collection, user};
 
@@ -42,8 +42,8 @@ pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Build> {
         .expect("Failed to setup cors configuration.");
 
     rocket::build()
-        .mount("/user/", user::routes())
-        .mount("/collection/", collection::routes())
+        .mount("/users", user::routes())
+        .mount("/collections", collection::routes())
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(cors.clone())
         .manage(cors)

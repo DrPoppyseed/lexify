@@ -1,9 +1,9 @@
 use std::ops::Deref;
 
-use diesel::{connection::SimpleConnection, Connection, QueryDsl, RunQueryDsl};
+use diesel::{Connection, QueryDsl, RunQueryDsl};
 use rocket::http::{ContentType, Status};
 
-use lexify_api::{api, db, rocket_launch::DbPool};
+use lexify_api::{api, db};
 
 use crate::utils::setup;
 
@@ -12,31 +12,10 @@ static COL_ID: &str = "dummy_collection_id";
 static COL_NAME: &str = "dummy_collection_name";
 static COL_DESC: &str = "dummy_collection_description";
 
-async fn before_each(db_pool: &DbPool) -> Result<(), db::StorageError> {
-    let conn = db_pool.get().map_err(db::StorageError::from)?;
-
-    conn.batch_execute(
-        r#"
-    DROP TABLE IF EXISTS collections;
-    "#,
-    )
-    .expect("Failed to execute cleanup scripts for database");
-
-    let migration = tokio::fs::read_to_string("./migrations/migrate.sql")
-        .await
-        .expect("Failed to read the migration file.");
-
-    conn.batch_execute(migration.as_str())
-        .expect("Failed to run migrations after cleanup.");
-
-    Ok(())
-}
-
 #[ignore]
 #[rocket::async_test]
 async fn create_collection_happy_path() {
     let (db_pool, client, _) = setup().await;
-    let _cleanup = before_each(&db_pool).await;
 
     let req_body = api::Collection {
         id:          COL_ID.to_string(),
@@ -46,7 +25,7 @@ async fn create_collection_happy_path() {
     };
 
     let req = client
-        .post("/collection/collections")
+        .post("/collections")
         .header(ContentType::JSON)
         .json(&req_body);
 
@@ -56,14 +35,14 @@ async fn create_collection_happy_path() {
     assert_eq!(res.status(), Status { code: 201 });
 
     let conn = db_pool.get().unwrap();
-    let db = conn
+    let collection_in_db = conn
         .transaction(|| {
             db::schema::collections::dsl::collections
                 .find(COL_ID)
-                .load::<db::Collection>(conn.deref())
+                .get_result::<db::Collection>(conn.deref())
         })
         .unwrap();
 
-    assert_eq!(db[0].id, COL_ID);
-    assert_eq!(db[0].user_id, USER_ID);
+    assert_eq!(collection_in_db.id, COL_ID);
+    assert_eq!(collection_in_db.user_id, USER_ID);
 }

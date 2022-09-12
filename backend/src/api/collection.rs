@@ -7,7 +7,7 @@ pub fn routes() -> Vec<Route> {
     routes![create_collection]
 }
 
-#[post("/collections", data = "<collection>")]
+#[post("/", data = "<collection>")]
 pub async fn create_collection(
     collection: Json<api::Collection>,
     state: &State<ServerState>,

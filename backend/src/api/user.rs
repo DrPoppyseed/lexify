@@ -1,9 +1,10 @@
 use chrono::Utc;
 use futures::TryFutureExt;
-use rocket::{post, routes, serde::json::Json, Route, State};
+use rocket::{http::Status, post, routes, serde::json::Json, Route, State};
 
 use crate::{
     api,
+    api::ApiResponse,
     db,
     http_error::HttpError,
     rocket_launch::{DbPool, ServerState},
@@ -15,39 +16,48 @@ pub fn routes() -> Vec<Route> {
 
 pub async fn create_user(
     new_user: Json<api::User>,
-    db_user: Option<db::User>,
     pool: &DbPool,
-) -> Result<api::User, db::StorageError> {
+) -> Result<db::User, db::StorageError> {
     let created_at = Utc::now().naive_utc();
 
-    match db_user {
-        Some(db_user) => Ok(api::User { id: db_user.id }),
-        None => {
-            db::User::insert_user(
-                pool,
-                db::User {
-                    id: new_user.id.clone(),
-                    created_at,
-                    updated_at: created_at,
-                },
-            )
-            .map_ok(|user| api::User { id: user.id })
-            .await
-        }
-    }
+    let new_user = db::User {
+        id: new_user.id.clone(),
+        created_at,
+        updated_at: created_at,
+    };
+
+    db::User::insert_user(pool, new_user.clone())
+        .map_ok(|_| new_user)
+        .await
 }
 
-#[post("/users", data = "<user>")]
+#[post("/", data = "<user>")]
 pub async fn get_or_create_user(
     state: &State<ServerState>,
     user: Json<api::User>,
-) -> Result<Json<api::User>, HttpError> {
+) -> Result<ApiResponse<api::User>, HttpError> {
     db::User::get_user(&state.db_pool, user.id.clone())
-        .and_then(|db_user| create_user(user, db_user, &state.db_pool))
-        .map_ok(Json)
-        .map_err(|e| match e {
-            db::StorageError::NotFoundError(_) => HttpError::not_found(),
-            _ => HttpError::internal_error(),
+        .and_then(|db_user| async {
+            match db_user {
+                Some(db_user) => Ok((db_user, Status::Ok)),
+                None => {
+                    create_user(user, &state.db_pool)
+                        .map_ok(|user| (user, Status::Created))
+                        .await
+                }
+            }
         })
         .await
+        .map(|(user, status)| ApiResponse {
+            json: Json(api::User { id: user.id }),
+            status,
+        })
+        .map_err(|e| {
+            println!("[API][get_or_create_user] Failed due to {:#?}", e);
+
+            match e {
+                db::StorageError::NotFoundError(_) => HttpError::not_found(),
+                _ => HttpError::internal_error(),
+            }
+        })
 }

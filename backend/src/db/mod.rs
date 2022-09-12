@@ -8,7 +8,7 @@ pub mod collection;
 pub mod schema;
 pub mod user;
 
-#[derive(Queryable, Insertable, Serialize, Deserialize, Debug)]
+#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone)]
 #[table_name = "users"]
 pub struct User {
     pub id:         String,

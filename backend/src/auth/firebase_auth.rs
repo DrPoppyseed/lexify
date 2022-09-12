@@ -15,3 +15,9 @@ impl FirebaseConfig {
             .expect("Error: failed to parse firebase config.")
     }
 }
+
+impl Default for FirebaseConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}

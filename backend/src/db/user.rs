@@ -11,14 +11,14 @@ impl User {
     pub async fn insert_user(
         pool: &DbPool,
         new_user: User,
-    ) -> Result<User, StorageError> {
+    ) -> Result<(), StorageError> {
         let pool = pool.get()?;
 
         pool.transaction(|| {
             diesel::insert_into(users::table)
                 .values(&new_user)
                 .execute(pool.deref())
-                .map(|_| new_user)
+                .map(|_| ())
         })
         .map_err(StorageError::from)
     }

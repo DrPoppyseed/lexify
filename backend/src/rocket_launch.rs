@@ -14,7 +14,6 @@ pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
 pub type DbPooled = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 pub struct ServerState {
-    pub cors:    Cors,
     pub db_pool: DbPool,
 }
 
@@ -47,5 +46,6 @@ pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Build> {
         .mount("/collection/", collection::routes())
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(cors.clone())
-        .manage(ServerState { cors, db_pool })
+        .manage(cors)
+        .manage(ServerState { db_pool })
 }

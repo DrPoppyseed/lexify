@@ -5,7 +5,8 @@ import { useAuth } from "./hooks/useAuth";
 const ProtectedRoute: FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
 
-  return user ? <>children</> : <Navigate to="/" />;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return user ? <>{children}</> : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

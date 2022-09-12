@@ -1,6 +1,6 @@
 import { atom, atomFamily, useRecoilCallback } from "recoil";
 import { nanoid } from "nanoid";
-import type { VocabWord } from "../types/VocabWord";
+import type { VocabWord } from "../domain/types";
 import type { VocabWordForm } from "../components/VocabCard/VocabCard";
 
 export const vocabWordsState = atom<ReadonlyArray<string>>({

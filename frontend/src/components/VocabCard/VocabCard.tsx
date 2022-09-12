@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRecoilState } from "recoil";
 import produce from "immer";
 import VocabCardFlipperBase from "./VocabCardFlipperBase";
-import type { VocabWord } from "../../types/VocabWord";
+import type { VocabWord } from "../../domain/types";
 import { vocabWordState } from "../../state/vocabWordsState";
 import VocabCardOneSideBase from "./VocabCardOneSideBase";
 import { Sides } from "../../types/Sides";

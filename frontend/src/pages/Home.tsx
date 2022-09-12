@@ -57,7 +57,9 @@ const Home = () => {
       <Drawer width={drawerWidth} />
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={drawerWidth}>
         {!params.id && !currentCollection ? (
-          <div>id</div>
+          <div>
+            TODO: create new collection if collection id is not specified in url
+          </div>
         ) : (
           <>
             {/*  header */}

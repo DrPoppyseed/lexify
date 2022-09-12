@@ -11,11 +11,9 @@ import {
 import { Add, Menu } from "@mui/icons-material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { isDrawerOpenState } from "../../state/pageState";
-import {
-  collectionsState,
-  useCreateCollection,
-} from "../../state/collectionsState";
+import { collectionsState } from "../../state/collectionsState";
 import DrawerItem from "./DrawerItem";
+import { useCreateCollection } from "../../hooks/useCollection";
 
 type DrawerProps = {
   width?: number;
@@ -24,10 +22,10 @@ type DrawerProps = {
 const Drawer: FC<DrawerProps> = ({ width = 30 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const collections = useRecoilValue(collectionsState);
-  const createCollection = useCreateCollection();
-  const onClickCreateCollection = () => {
-    createCollection();
-    console.log("yo whats up: ", collections[collections.length - 1]);
+  const { createCollection } = useCreateCollection();
+
+  const onClickCreateCollection = async () => {
+    await createCollection();
   };
 
   return (

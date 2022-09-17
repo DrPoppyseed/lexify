@@ -24,6 +24,8 @@ diesel = { version = "1.4.8", features = ["r2d2", "mysql", "chrono"] }
 reqwest = { version = "0.11.11", features = ["json"] }
 chrono = { version = "0.4", features = ["serde"] }
 rocket = { version = "0.5.0-rc.1", features = ["json"] }
+base64 = "0.13.0"
+fireauth = "0.1.5"
 
 [dev-dependencies]
 wiremock = "0.5.14"

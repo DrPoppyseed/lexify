@@ -1,12 +1,14 @@
 use std::env;
 
-use dotenv::dotenv;
-
 use crate::auth::FirebaseConfig;
 
 impl FirebaseConfig {
-    pub fn new() -> FirebaseConfig {
-        dotenv().ok();
+    pub fn new() -> Self {
+        Self::from_env_filename(".env")
+    }
+
+    pub fn from_env_filename(env_filename: &str) -> Self {
+        dotenv::from_filename(env_filename).ok();
 
         let firebase_admin_certs = env::var("FIREBASE_ADMIN_CERTS").expect(
             "Error: failed to retrieve env variable. Could not setup firebase configuration.");

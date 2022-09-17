@@ -9,7 +9,17 @@ use jsonwebtoken::{
     Validation,
 };
 
-use crate::auth::{jwk::get_firebase_jwks, FirebaseConfig, Jwt};
+use crate::auth::{jwk::get_firebase_jwks, AuthError, FirebaseConfig, Jwt};
+
+fn build_validation(project_id: &str) -> Validation {
+    let mut validation = Validation::new(Algorithm::RS256);
+    validation.set_issuer(&[format!(
+        "https://securetoken.google.com/{}",
+        project_id
+    )]);
+    validation.set_audience(&[project_id]);
+    validation
+}
 
 impl Jwt {
     pub fn new(audience: &str, uid: String) -> Self {
@@ -27,44 +37,48 @@ impl Jwt {
         private_key_id: String,
         private_key: String,
         uid: String,
-    ) -> Result<String, jsonwebtoken::errors::Error> {
+    ) -> Result<String, AuthError> {
         let mut header = Header::new(Algorithm::RS256);
         header.kid = Some(private_key_id);
 
-        let claims = Self::new(audience, uid);
-        let pem = str::as_bytes(&private_key);
-        let secret_key = EncodingKey::from_rsa_pem(pem);
-        match secret_key {
-            Ok(key) => jsonwebtoken::encode(&header, &claims, &key),
-            Err(err) => Err(err),
-        }
+        EncodingKey::from_rsa_pem(str::as_bytes(&private_key))
+            .and_then(|key| {
+                let claims = Self::new(audience, uid);
+                jsonwebtoken::encode(&header, &claims, &key)
+            })
+            .map_err(AuthError::from)
     }
 
     pub async fn verify(
         token: &str,
         firebase_config: &FirebaseConfig,
-    ) -> Result<jsonwebtoken::TokenData<Jwt>, jsonwebtoken::errors::Error> {
-        let kid = match decode_header(token).map(|header| header.kid) {
-            Ok(Some(k)) => k,
-            Ok(None) => {
-                return Err(jsonwebtoken::errors::Error::from(
-                    ErrorKind::InvalidToken,
-                ));
-            }
-            Err(err) => return Err(err),
-        };
-        let jwks = get_firebase_jwks().await.unwrap();
-        let jwk = jwks.get(&kid).unwrap();
+        jwks_url: &str,
+    ) -> Result<jsonwebtoken::TokenData<Jwt>, AuthError> {
+        let kid = decode_header(token).map_err(AuthError::from).and_then(
+            |header| {
+                header.kid.ok_or_else(|| {
+                    AuthError::JwtError(format!(
+                        "{:?}",
+                        ErrorKind::InvalidToken
+                    ))
+                })
+            },
+        )?;
 
-        let mut validation = Validation::new(Algorithm::RS256);
-        validation.set_issuer(&[format!(
-            "https://securetoken.google.com/{}",
-            &firebase_config.project_id
-        )]);
+        let jwk = get_firebase_jwks(jwks_url)
+            .await
+            .map_err(AuthError::from)
+            .and_then(|mut key_map| {
+                key_map.remove(&kid).ok_or_else(|| {
+                    AuthError::JwtError("Missing Jwk".to_string())
+                })
+            })?;
 
-        validation.set_audience(&[&firebase_config.project_id]);
-
-        let key = DecodingKey::from_rsa_components(&jwk.n, &jwk.e)?;
-        jsonwebtoken::decode::<Jwt>(token, &key, &validation)
+        DecodingKey::from_rsa_components(&jwk.n, &jwk.e)
+            .and_then(|key| {
+                let validation = build_validation(&firebase_config.project_id);
+                jsonwebtoken::decode::<Jwt>(token, &key, &validation)
+            })
+            .map_err(AuthError::from)
     }
 }

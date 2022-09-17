@@ -8,17 +8,22 @@ use dotenv;
 use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
-use crate::api::{collection, user};
+use crate::{
+    api::{collection, user},
+    auth::{FirebaseConfig, JwtConfig},
+};
 
 pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
 pub type DbPooled = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 pub struct ServerState {
-    pub db_pool: DbPool,
+    pub db_pool:        DbPool,
+    pub firebase_admin: FirebaseConfig,
+    pub jwt_config:     JwtConfig,
 }
 
-pub fn establish_connection_pool(env_file_name: &str) -> DbPool {
-    dotenv::from_filename(env_file_name).ok();
+pub fn establish_connection_pool(env_filename: &str) -> DbPool {
+    dotenv::from_filename(env_filename).ok();
 
     let database_url = env::var("DB_URL")
         .expect("Failed to retrieve environment value DB_URL.");
@@ -28,7 +33,7 @@ pub fn establish_connection_pool(env_file_name: &str) -> DbPool {
         .expect("Failed to establish database connection pool.")
 }
 
-pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Build> {
+pub async fn rocket_launch(server_state: ServerState) -> Rocket<Build> {
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
@@ -47,5 +52,5 @@ pub async fn rocket_launch(db_pool: DbPool) -> Rocket<Build> {
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(cors.clone())
         .manage(cors)
-        .manage(ServerState { db_pool })
+        .manage(server_state)
 }

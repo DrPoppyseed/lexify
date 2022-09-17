@@ -9,7 +9,7 @@ export const createCollection = async (
   token: Option<string>
 ): Promise<null> => {
   const { data } = await api.post<null, AxiosResponse<null>, Collection>(
-    "/collection/collections",
+    "/collections",
     collection,
     authHeader(token)
   );

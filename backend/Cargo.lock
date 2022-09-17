@@ -456,6 +456,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fireauth"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc25de4b75f65817fc57e791e437d53df65b04ecbc769850d3d1ea22126192b4"
+dependencies = [
+ "chrono",
+ "reqwest",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -912,10 +924,12 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 name = "lexify-api"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "bincode",
  "chrono",
  "diesel",
  "dotenv",
+ "fireauth",
  "futures",
  "jsonwebtoken",
  "log",

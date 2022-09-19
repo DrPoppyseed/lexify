@@ -25,7 +25,6 @@ async fn call_get_or_create_user(client: &Client) -> LocalResponse {
     req.dispatch().await
 }
 
-#[ignore]
 #[rocket::async_test]
 async fn create_user_happy_path() {
     let (db_pool, client, _) = setup().await;
@@ -47,7 +46,6 @@ async fn create_user_happy_path() {
     assert_eq!(user_in_db.id, USER_ID);
 }
 
-#[ignore]
 #[rocket::async_test]
 async fn get_user() {
     let (db_pool, client, _) = setup().await;

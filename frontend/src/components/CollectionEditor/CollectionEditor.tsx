@@ -4,10 +4,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect } from "react";
 import { useRecoilState } from "recoil";
-import produce from "immer";
 import { EditableTitle } from "../EditableTypography/EditableTypography";
 import EditableTypographyBase from "../EditableTypography/EditableTypographyBase";
 import { collectionState } from "../../state/collectionsState";
+import { Collection } from "../../domain/types";
+import { useUpdateCollection } from "../../hooks/useCollection";
 
 const collectionEditorSchema = z.object({
   name: z.string().max(50),
@@ -17,6 +18,7 @@ const collectionEditorSchema = z.object({
 export type CollectionEditorForm = z.infer<typeof collectionEditorSchema>;
 
 const CollectionEditor: FC<{ id: string }> = ({ id }) => {
+  const { updateCollection } = useUpdateCollection();
   const [collection, setCollection] = useRecoilState(collectionState(id));
   const { reset, register, handleSubmit } = useForm<CollectionEditorForm>({
     resolver: zodResolver(collectionEditorSchema),
@@ -34,12 +36,12 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
   }, [reset, id, collection.name, collection.description]);
 
   const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
-    setCollection((prev) =>
-      produce(prev, (draft) => {
-        draft.name = formData.name;
-        draft.description = formData.description;
-      })
-    );
+    const updatedCollection: Collection = {
+      ...collection,
+      ...formData,
+    };
+    setCollection(updatedCollection);
+    updateCollection(updatedCollection);
   };
 
   return (

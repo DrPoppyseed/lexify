@@ -41,13 +41,7 @@ async fn call_create_collection(client: &Client) -> LocalResponse {
 
     client
         .post("/collections")
-        .header(Header::new(
-            "Authorization",
-            format!(
-                "Bearer {}",
-                create_valid_bearer_token(USER_ID.to_string())
-            ),
-        ))
+        .header(auth_header())
         .json(&req_body)
         .dispatch()
         .await
@@ -61,7 +55,22 @@ async fn call_get_collections(client: &Client) -> LocalResponse {
         .await
 }
 
-#[ignore]
+async fn call_update_collection(client: &Client) -> LocalResponse {
+    let req_body = api::Collection {
+        id:          COL_ID.to_string(),
+        user_id:     USER_ID.to_string(),
+        name:        "updated test name".to_string(),
+        description: Some("updated test description".to_string()),
+    };
+
+    client
+        .put("/collections")
+        .header(auth_header())
+        .json(&req_body)
+        .dispatch()
+        .await
+}
+
 #[rocket::async_test]
 async fn create_collection_happy_path() {
     let (db_pool, client, mock_server) = setup().await;
@@ -86,7 +95,6 @@ async fn create_collection_happy_path() {
     assert_eq!(collection_in_db.user_id, USER_ID);
 }
 
-#[ignore]
 #[rocket::async_test]
 async fn get_collections_happy_path() {
     let (_, client, mock_server) = setup().await;
@@ -109,4 +117,29 @@ async fn get_collections_happy_path() {
 
     assert_eq!(&body.len(), &1usize);
     assert_eq!(body[0], desired_body);
+}
+
+#[rocket::async_test]
+async fn update_collection_happy_path() {
+    let (db_pool, client, mock_server) = setup().await;
+
+    mock_jwk_issuer().expect(2).mount(&mock_server).await;
+    call_create_collection(&client).await;
+    call_update_collection(&client).await;
+
+    let conn = db_pool.get().unwrap();
+    let collection_in_db = conn
+        .transaction(|| {
+            db::schema::collections::dsl::collections
+                .find(COL_ID)
+                .get_result::<db::Collection>(conn.deref())
+        })
+        .unwrap();
+
+    assert_eq!(collection_in_db.id, COL_ID);
+    assert_eq!(
+        collection_in_db.description,
+        Some("updated test description".to_string())
+    );
+    assert_eq!(collection_in_db.name, "updated test name".to_string())
 }

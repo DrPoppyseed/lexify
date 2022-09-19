@@ -34,7 +34,6 @@ const Home = () => {
 
   useEffect(() => {
     if (isSuccess && data) {
-      console.log("data: ", data);
       setCollections(data);
     }
   }, [setCollections, data, isSuccess]);

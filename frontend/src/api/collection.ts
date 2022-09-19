@@ -17,11 +17,26 @@ export const createCollection = async (
   return data;
 };
 
+export const updateCollection = async (
+  collection: Collection
+): Promise<null> => {
+  const token = await getAuth()?.currentUser?.getIdToken();
+  const { data } = await api.put<null, AxiosResponse<null>, Collection>(
+    "/collections",
+    collection,
+    authHeader(token)
+  );
+
+  return data;
+};
+
 export const getCollections = async (): Promise<ReadonlyArray<Collection>> => {
   const token = await getAuth()?.currentUser?.getIdToken();
-  const {data} = await api.get<ReadonlyArray<Collection>,
-      AxiosResponse<ReadonlyArray<Collection>>,
-      null>("/collections", authHeader(token));
+  const { data } = await api.get<
+    ReadonlyArray<Collection>,
+    AxiosResponse<ReadonlyArray<Collection>>,
+    null
+  >("/collections", authHeader(token));
 
   return data;
 };

@@ -1,9 +1,9 @@
-use chrono::Utc;
 use futures::TryFutureExt;
 use rocket::{
     get,
     http::Status,
     post,
+    put,
     routes,
     serde::json::Json,
     Route,
@@ -20,7 +20,7 @@ use crate::{
 };
 
 pub fn routes() -> Vec<Route> {
-    routes![get_collections, create_collection]
+    routes![get_collections, create_collection, update_collection]
 }
 
 #[get("/")]
@@ -74,23 +74,37 @@ pub async fn create_collection(
         Err(HttpError::forbidden())
     } else {
         info!("[API][create_collection] user={uid} inserting collection.");
-        let created_at = Utc::now().naive_utc();
-        db::Collection::insert_collection(
-            &state.db_pool,
-            db::Collection {
-                id: collection.id.clone(),
-                user_id: collection.user_id.clone(),
-                name: collection.name.clone(),
-                description: collection.description.clone(),
-                created_at,
-                updated_at: created_at,
-            },
-        )
-        .map_ok(|_| Status::Created)
-        .map_err(|e| {
-            error!("[API][create_collection] {:#?}", e);
-            HttpError::from(e)
-        })
-        .await
+        db::Collection::insert_collection(&state.db_pool, collection.0)
+            .map_ok(|_| Status::Created)
+            .map_err(|e| {
+                error!("[API][create_collection] {:#?}", e);
+                HttpError::from(e)
+            })
+            .await
+    }
+}
+
+#[put("/", data = "<collection>")]
+pub async fn update_collection(
+    collection: Json<api::Collection>,
+    state: &State<ServerState>,
+    token: BearerToken,
+) -> Result<Status, HttpError> {
+    info!("[API][update_collection] function triggered!");
+
+    let uid = api::get_uid_from_token(state, &token)
+        .map_err(|_| HttpError::unauthorized())
+        .await?;
+
+    if uid != collection.user_id.clone() {
+        Err(HttpError::forbidden())
+    } else {
+        db::Collection::update_collection(&state.db_pool, collection.0)
+            .map_ok(|_| Status::Ok)
+            .map_err(|e| {
+                error!("[API][update_collection] {:#?}", e);
+                HttpError::from(e)
+            })
+            .await
     }
 }

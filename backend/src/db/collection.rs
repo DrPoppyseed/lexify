@@ -5,6 +5,7 @@ use diesel::{Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
 use tracing::{error, info};
 
 use crate::{
+    api,
     db::{schema::collections, Collection, StorageError},
     rocket_launch::DbPool,
 };
@@ -12,16 +13,24 @@ use crate::{
 impl Collection {
     pub async fn insert_collection(
         pool: &DbPool,
-        new_collection: Collection,
+        new_collection: api::Collection,
     ) -> Result<usize, StorageError> {
         let pool = pool.get().map_err(|e| {
             info!("[DB][insert_collection] Failed to get database connection from pool: {:#?}", e);
             StorageError::from(e)
         })?;
 
+        let created_at = Utc::now().naive_utc();
         pool.transaction(|| {
             diesel::insert_into(collections::table)
-                .values(&new_collection)
+                .values(Collection {
+                    id: new_collection.id.clone(),
+                    user_id: new_collection.user_id.clone(),
+                    name: new_collection.name.clone(),
+                    description: new_collection.description.clone(),
+                    created_at,
+                    updated_at: created_at,
+                })
                 .execute(pool.deref())
         })
         .map_err(|e| {
@@ -32,7 +41,7 @@ impl Collection {
 
     pub async fn update_collection(
         pool: &DbPool,
-        collection: Collection,
+        collection: api::Collection,
     ) -> Result<usize, StorageError> {
         let pool = pool.get()?;
         let updated_at = Utc::now().naive_utc();
@@ -41,10 +50,11 @@ impl Collection {
             diesel::update(
                 collections::dsl::collections.find(collection.id.clone()),
             )
-            .set(Collection {
-                updated_at,
-                ..collection
-            })
+            .set((
+                collections::name.eq(collection.name),
+                collections::description.eq(collection.description),
+                collections::updated_at.eq(updated_at),
+            ))
             .execute(pool.deref())
         })
         .map_err(StorageError::from)

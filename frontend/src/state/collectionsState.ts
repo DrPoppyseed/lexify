@@ -43,6 +43,13 @@ export const useCreateCollection = () =>
     []
   );
 
+export const useUpdateCollection = () =>
+  useRecoilCallback(({ set }) => (collection: Collection) => {
+    set(collectionState(collection.id), {
+      ...collection,
+    });
+  });
+
 export const useCreateCollectionSync = () => {
   const setCollections = useSetRecoilState(collectionsState);
 

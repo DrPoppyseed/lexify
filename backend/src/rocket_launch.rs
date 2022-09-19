@@ -38,7 +38,7 @@ pub async fn rocket_launch(server_state: ServerState) -> Rocket<Build> {
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
-            ["Get", "Post", "Patch", "Delete", "Options"]
+            ["Get", "Post", "Put", "Delete", "Options"]
                 .iter()
                 .map(|s| FromStr::from_str(s).unwrap())
                 .collect(),

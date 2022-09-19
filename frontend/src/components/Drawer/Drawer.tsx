@@ -19,7 +19,6 @@ const Drawer: FC<{ width?: number }> = ({ width = 30 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const collections = useRecoilValue(collectionsState);
   const { createCollection } = useCreateCollection();
-  console.log("collections: ", collections);
 
   const onClickCreateCollection = async () => {
     await createCollection();

@@ -1,6 +1,6 @@
 use diesel::{Connection, QueryDsl, RunQueryDsl};
 use rocket::{
-    http::{Header, Status},
+    http::Status,
     local::asynchronous::{Client, LocalResponse},
 };
 use serde::Serialize;
@@ -9,7 +9,7 @@ use lexify_api::{api, db};
 
 use crate::{
     mocks::mock_jwk_issuer,
-    utils::{create_valid_bearer_token, setup},
+    utils::{auth_header, setup},
 };
 
 static USER_ID: &str = "test_user_id";
@@ -22,13 +22,6 @@ pub struct TestJwks {
     jwks: Vec<String>,
 }
 
-fn auth_header() -> Header<'static> {
-    Header::new(
-        "Authorization",
-        format!("Bearer {}", create_valid_bearer_token(USER_ID.to_string())),
-    )
-}
-
 async fn call_create_collection(client: &Client) -> LocalResponse {
     let req_body = api::Collection {
         id:          COL_ID.to_string(),
@@ -39,7 +32,7 @@ async fn call_create_collection(client: &Client) -> LocalResponse {
 
     client
         .post("/collections")
-        .header(auth_header())
+        .header(auth_header(USER_ID))
         .json(&req_body)
         .dispatch()
         .await
@@ -48,7 +41,7 @@ async fn call_create_collection(client: &Client) -> LocalResponse {
 async fn call_get_collections(client: &Client) -> LocalResponse {
     client
         .get("/collections")
-        .header(auth_header())
+        .header(auth_header(USER_ID))
         .dispatch()
         .await
 }
@@ -63,7 +56,7 @@ async fn call_update_collection(client: &Client) -> LocalResponse {
 
     client
         .put("/collections")
-        .header(auth_header())
+        .header(auth_header(USER_ID))
         .json(&req_body)
         .dispatch()
         .await

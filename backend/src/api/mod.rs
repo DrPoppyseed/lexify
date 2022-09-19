@@ -18,6 +18,7 @@ use crate::{
 
 pub mod collection;
 pub mod user;
+pub mod vocab_word;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {
@@ -30,6 +31,16 @@ pub struct Collection {
     pub user_id:     String,
     pub name:        String,
     pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct VocabWord {
+    pub id:            String,
+    pub collection_id: String,
+    pub word:          String,
+    pub definition:    String,
+    pub fails:         i32,
+    pub successes:     i32,
 }
 
 #[derive(Debug)]

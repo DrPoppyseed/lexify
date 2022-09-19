@@ -1,5 +1,5 @@
 use diesel::connection::SimpleConnection;
-use rocket::local::asynchronous::Client;
+use rocket::{http::Header, local::asynchronous::Client};
 use wiremock::MockServer;
 
 use lexify_api::{
@@ -43,6 +43,7 @@ async fn cleanup(db_pool: &DbPool) {
         r#"
     DROP TABLE IF EXISTS collections;
     DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS vocab_words;
     "#,
     )
     .expect("Failed to execute cleanup scripts for database");
@@ -65,4 +66,11 @@ pub fn create_valid_bearer_token(uid: String) -> String {
         uid,
     )
     .unwrap()
+}
+
+pub fn auth_header(user_id: &str) -> Header<'static> {
+    Header::new(
+        "Authorization",
+        format!("Bearer {}", create_valid_bearer_token(user_id.to_string())),
+    )
 }

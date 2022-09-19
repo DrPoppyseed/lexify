@@ -9,7 +9,7 @@ use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
 use crate::{
-    api::{collection, user},
+    api::{collection, user, vocab_word},
     auth::{FirebaseConfig, JwtConfig},
 };
 
@@ -49,6 +49,7 @@ pub async fn rocket_launch(server_state: ServerState) -> Rocket<Build> {
     rocket::build()
         .mount("/users", user::routes())
         .mount("/collections", collection::routes())
+        .mount("/vocab_words", vocab_word::routes())
         .mount("/", rocket_cors::catch_all_options_routes())
         .attach(cors.clone())
         .manage(cors)

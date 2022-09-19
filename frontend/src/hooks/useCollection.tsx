@@ -1,21 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
 import { useCreateCollection as useCreateCollectionInState } from "../state/collectionsState";
 import type { Collection as APICollection } from "../api/types";
-import { createCollection as createCollectionInAPI } from "../api/collection";
-import type { Option } from "../types/utils";
+import {
+  createCollection as createCollectionInAPI,
+  getCollections as getCollectionsInAPI,
+} from "../api/collection";
 import { collectionFactory } from "../domain/collection";
 
 export const useCreateCollection = () => {
   const { mutate, isLoading, isError, isSuccess } = useMutation(
-    ({
-      collection,
-      token,
-    }: {
-      collection: APICollection;
-      token: Option<string>;
-    }) => createCollectionInAPI(collection, token)
+    (collection: APICollection) => createCollectionInAPI(collection)
   );
   const createCollectionInState = useCreateCollectionInState();
   const navigate = useNavigate();
@@ -25,16 +21,24 @@ export const useCreateCollection = () => {
     if (!user?.uid) throw Error("Unauthorized");
 
     const collection = collectionFactory();
-
     createCollectionInState(collection);
 
     await mutate({
-      collection: { ...collection, user_id: user?.uid },
-      token: await user.getIdToken(),
+      ...collection,
+      user_id: user?.uid,
     });
 
     navigate(`/${collection.id}`);
   };
 
   return { createCollection, isLoading, isError, isSuccess };
+};
+
+export const useGetCollections = () => {
+  const {data, isLoading, isError, isSuccess} = useQuery(
+      ["getCollections"],
+      getCollectionsInAPI
+  );
+
+  return {data, isLoading, isError, isSuccess};
 };

@@ -14,8 +14,10 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import {
   currentCollectionState,
   useCreateCollectionSync,
+  useSetCollections,
 } from "../state/collectionsState";
 import { collectionFactory } from "../domain/collection";
+import { useGetCollections } from "../hooks/useCollection";
 
 const Home = () => {
   const vocabWords = useRecoilValue(vocabWordsState);
@@ -27,6 +29,15 @@ const Home = () => {
   const [currentCollection, setCurrentCollection] = useRecoilState(
     currentCollectionState
   );
+  const { data, isSuccess } = useGetCollections();
+  const setCollections = useSetCollections();
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      console.log("data: ", data);
+      setCollections(data);
+    }
+  }, [setCollections, data, isSuccess]);
 
   const drawerWidth = 30;
 

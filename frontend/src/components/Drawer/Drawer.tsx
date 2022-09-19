@@ -15,14 +15,11 @@ import { collectionsState } from "../../state/collectionsState";
 import DrawerItem from "./DrawerItem";
 import { useCreateCollection } from "../../hooks/useCollection";
 
-type DrawerProps = {
-  width?: number;
-};
-
-const Drawer: FC<DrawerProps> = ({ width = 30 }) => {
+const Drawer: FC<{ width?: number }> = ({ width = 30 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const collections = useRecoilValue(collectionsState);
   const { createCollection } = useCreateCollection();
+  console.log("collections: ", collections);
 
   const onClickCreateCollection = async () => {
     await createCollection();

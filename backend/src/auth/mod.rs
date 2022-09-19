@@ -61,6 +61,7 @@ impl From<reqwest::Error> for AuthError {
     }
 }
 
+#[derive(Debug)]
 pub struct JwtConfig {
     pub jwks_url: String,
 }

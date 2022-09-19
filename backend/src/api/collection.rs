@@ -1,5 +1,7 @@
 use chrono::Utc;
+use futures::TryFutureExt;
 use rocket::{http::Status, post, routes, serde::json::Json, Route, State};
+use tracing::{error, info};
 
 use crate::{
     api,
@@ -19,7 +21,7 @@ pub async fn create_collection(
     state: &State<ServerState>,
     token: BearerToken,
 ) -> Result<Status, HttpError> {
-    println!("[API][create_collection] function triggered!");
+    info!("[API][create_collection] function triggered!");
 
     let created_at = Utc::now().naive_utc();
     let uid = Jwt::verify(
@@ -27,11 +29,11 @@ pub async fn create_collection(
         &state.firebase_admin,
         &state.jwt_config.jwks_url,
     )
-    .await
-    .map(|token| token.claims.sub)
-    .map_err(|_| HttpError::unauthorized())?;
+    .map_ok(|token| token.claims.sub)
+    .map_err(|_| HttpError::unauthorized())
+    .await?;
 
-    println!("[API][create_collection] user={uid} inserting collection.");
+    info!("[API][create_collection] user={uid} inserting collection.");
 
     if uid != collection.user_id.clone() {
         Err(HttpError::forbidden())
@@ -47,11 +49,11 @@ pub async fn create_collection(
                 updated_at: created_at,
             },
         )
-        .await
-        .map(|_| Status::Created)
+        .map_ok(|_| Status::Created)
         .map_err(|e| {
-            println!("[API][create_collection] {:#?}", e);
+            error!("[API][create_collection] {:#?}", e);
             HttpError::from(e)
         })
+        .await
     }
 }

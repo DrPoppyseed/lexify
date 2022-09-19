@@ -27,7 +27,7 @@ pub struct Collection {
 
 #[derive(Debug)]
 pub struct ApiResponse<T> {
-    pub json:   Json<T>,
+    pub json:   Option<Json<T>>,
     pub status: Status,
 }
 

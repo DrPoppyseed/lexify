@@ -2,6 +2,7 @@ use std::ops::Deref;
 
 use chrono::Utc;
 use diesel::{Connection, QueryDsl, RunQueryDsl};
+use tracing::{error, info};
 
 use crate::{
     db::{schema::collections, Collection, StorageError},
@@ -14,7 +15,7 @@ impl Collection {
         new_collection: Collection,
     ) -> Result<usize, StorageError> {
         let pool = pool.get().map_err(|e| {
-            println!("[DB][insert_collection] Failed to get database connection from pool: {:#?}", e);
+            info!("[DB][insert_collection] Failed to get database connection from pool: {:#?}", e);
             StorageError::from(e)
         })?;
 
@@ -24,7 +25,7 @@ impl Collection {
                 .execute(pool.deref())
         })
         .map_err(|e| {
-            println!("[DB][insert_collection] {:#?}", e);
+            error!("[DB][insert_collection] {:#?}", e);
             StorageError::from(e)
         })
     }

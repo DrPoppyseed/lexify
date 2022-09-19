@@ -1,6 +1,7 @@
 use chrono::Utc;
 use futures::TryFutureExt;
 use rocket::{http::Status, post, routes, serde::json::Json, Route, State};
+use tracing::error;
 
 use crate::{
     api,
@@ -47,17 +48,16 @@ pub async fn get_or_create_user(
                 }
             }
         })
-        .await
-        .map(|(user, status)| ApiResponse {
-            json: Json(api::User { id: user.id }),
+        .map_ok(|(user, status)| ApiResponse {
+            json: Some(Json(api::User { id: user.id })),
             status,
         })
         .map_err(|e| {
-            println!("[API][get_or_create_user] Failed due to {:#?}", e);
-
+            error!("[API][get_or_create_user] Failed due to {:#?}", e);
             match e {
                 db::StorageError::NotFoundError(_) => HttpError::not_found(),
                 _ => HttpError::internal_error(),
             }
         })
+        .await
 }

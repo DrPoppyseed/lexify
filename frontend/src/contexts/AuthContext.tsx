@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import type { User } from "firebase/auth";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "../config/firebase";
+import { firebaseApp } from "../config/firebase";
 
 type AuthContextType = {
   user: User | null;
@@ -31,9 +31,10 @@ const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthContextType["user"]>(null);
 
   useEffect(() => {
-    onAuthStateChanged(getAuth(app), (user) => {
-      if (user) {
-        setUser(user);
+    console.log("trg");
+    onAuthStateChanged(getAuth(firebaseApp), (authnedUser) => {
+      if (authnedUser) {
+        setUser(authnedUser);
       }
       setAuthLoading(false);
     });

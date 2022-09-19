@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { RecoilRoot } from "recoil";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -54,16 +55,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={<div />}>
-        <AuthProvider>
-          <RecoilRoot>
-            <MuiThemeProvider theme={theme}>
-              <EmotionThemeProvider theme={theme}>
-                <CssBaseline />
-                <App />
-              </EmotionThemeProvider>
-            </MuiThemeProvider>
-          </RecoilRoot>
-        </AuthProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <RecoilRoot>
+              <MuiThemeProvider theme={theme}>
+                <EmotionThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <App />
+                </EmotionThemeProvider>
+              </MuiThemeProvider>
+            </RecoilRoot>
+          </AuthProvider>
+        </BrowserRouter>
       </Suspense>
     </QueryClientProvider>
   </React.StrictMode>

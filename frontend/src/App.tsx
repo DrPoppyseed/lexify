@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import React, { lazy, useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 
@@ -16,24 +16,22 @@ const App = () => {
   return authLoading ? (
     <Loading />
   ) : (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/">
-          <Route index element={user ? <Home /> : <Landing />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-          <Route
-            path=":id"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/">
+        <Route index element={user ? <Home /> : <Landing />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+        <Route
+          path=":id"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 

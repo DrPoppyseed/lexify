@@ -1,7 +1,10 @@
 use std::ops::Deref;
 
 use diesel::{Connection, QueryDsl, RunQueryDsl};
-use rocket::http::{Header, Status};
+use rocket::{
+    http::{Header, Status},
+    local::asynchronous::{Client, LocalResponse},
+};
 use serde::Serialize;
 
 use lexify_api::{api, db};
@@ -21,11 +24,14 @@ pub struct TestJwks {
     jwks: Vec<String>,
 }
 
-#[ignore]
-#[rocket::async_test]
-async fn create_collection_happy_path() {
-    let (db_pool, client, mock_server) = setup().await;
+fn auth_header() -> Header<'static> {
+    Header::new(
+        "Authorization",
+        format!("Bearer {}", create_valid_bearer_token(USER_ID.to_string())),
+    )
+}
 
+async fn call_create_collection(client: &Client) -> LocalResponse {
     let req_body = api::Collection {
         id:          COL_ID.to_string(),
         user_id:     USER_ID.to_string(),
@@ -33,9 +39,7 @@ async fn create_collection_happy_path() {
         description: Some(COL_DESC.to_string()),
     };
 
-    mock_jwk_issuer().expect(1).mount(&mock_server).await;
-
-    let req = client
+    client
         .post("/collections")
         .header(Header::new(
             "Authorization",
@@ -44,9 +48,27 @@ async fn create_collection_happy_path() {
                 create_valid_bearer_token(USER_ID.to_string())
             ),
         ))
-        .json(&req_body);
+        .json(&req_body)
+        .dispatch()
+        .await
+}
 
-    let res = req.dispatch().await;
+async fn call_get_collections(client: &Client) -> LocalResponse {
+    client
+        .get("/collections")
+        .header(auth_header())
+        .dispatch()
+        .await
+}
+
+#[ignore]
+#[rocket::async_test]
+async fn create_collection_happy_path() {
+    let (db_pool, client, mock_server) = setup().await;
+
+    mock_jwk_issuer().expect(1).mount(&mock_server).await;
+
+    let res = call_create_collection(&client).await;
 
     assert!(res.body().is_none());
     assert_eq!(res.status(), Status { code: 201 });
@@ -62,4 +84,29 @@ async fn create_collection_happy_path() {
 
     assert_eq!(collection_in_db.id, COL_ID);
     assert_eq!(collection_in_db.user_id, USER_ID);
+}
+
+#[ignore]
+#[rocket::async_test]
+async fn get_collections_happy_path() {
+    let (_, client, mock_server) = setup().await;
+
+    mock_jwk_issuer().expect(2).mount(&mock_server).await;
+
+    call_create_collection(&client).await;
+    let res = call_get_collections(&client).await;
+
+    assert_eq!(res.status(), Status { code: 200 });
+
+    let body = res.into_json::<Vec<api::Collection>>().await.unwrap();
+
+    let desired_body = api::Collection {
+        id:          COL_ID.to_string(),
+        user_id:     USER_ID.to_string(),
+        name:        COL_NAME.to_string(),
+        description: Some(COL_DESC.to_string()),
+    };
+
+    assert_eq!(&body.len(), &1usize);
+    assert_eq!(body[0], desired_body);
 }

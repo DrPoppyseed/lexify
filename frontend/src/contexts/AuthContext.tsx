@@ -31,7 +31,6 @@ const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthContextType["user"]>(null);
 
   useEffect(() => {
-    console.log("trg");
     onAuthStateChanged(getAuth(firebaseApp), (authnedUser) => {
       if (authnedUser) {
         setUser(authnedUser);

@@ -11,12 +11,17 @@ import { isDrawerOpenState } from "../state/pageState";
 import Drawer from "../components/Drawer/Drawer";
 import CollectionEditor from "../components/CollectionEditor/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { currentCollectionState } from "../state/collectionsState";
+import {
+  currentCollectionState,
+  useCreateCollectionSync,
+} from "../state/collectionsState";
+import { collectionFactory } from "../domain/collection";
 
 const Home = () => {
   const vocabWords = useRecoilValue(vocabWordsState);
   const params = useParams();
-  const { getItemFromLocalStorage } = useLocalStorage();
+  const createCollectionSync = useCreateCollectionSync();
+  const { getItemFromLocalStorage, setItemToLocalStorage } = useLocalStorage();
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const [isShaking, setIsShaking] = useRecoilState(isShakingState);
   const [currentCollection, setCurrentCollection] = useRecoilState(
@@ -26,7 +31,6 @@ const Home = () => {
   const drawerWidth = 30;
 
   useEffect(() => {
-    console.log("params: ", params);
     // try to retrieve latest accessed collection from localStorage if collection id is not specified
     if (!params?.id) {
       const lastAccessedCollectionId = getItemFromLocalStorage(
@@ -34,8 +38,14 @@ const Home = () => {
       );
       if (lastAccessedCollectionId && !currentCollection) {
         setCurrentCollection(lastAccessedCollectionId);
+      } else {
+        const collection = collectionFactory();
+        createCollectionSync(collection);
+        setCurrentCollection(collection.id);
+        setItemToLocalStorage("latestAccessedCollectionId", collection.id);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   return (
@@ -56,40 +66,30 @@ const Home = () => {
       </HeaderWrapper>
       <Drawer width={drawerWidth} />
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={drawerWidth}>
-        {!params.id && !currentCollection ? (
-          <div>
-            TODO: create new collection if collection id is not specified in url
-          </div>
-        ) : (
-          <>
-            {/*  header */}
-            <CollectionEditorWrapper xs={12} container>
-              <Grid item xs={1} />
-              <Grid item xs={10}>
-                <CollectionEditor
-                  id={params.id || (currentCollection as string)}
-                />
-              </Grid>
-              <Grid item xs={1} />
-            </CollectionEditorWrapper>
+        {/*  header */}
+        <CollectionEditorWrapper container>
+          <Grid item xs={1} />
+          <Grid item xs={10}>
+            <CollectionEditor id={params.id || (currentCollection as string)} />
+          </Grid>
+          <Grid item xs={1} />
+        </CollectionEditorWrapper>
 
-            {/*  body */}
-            <Grid xs={12} container>
-              <Grid item xs={1} />
-              <Grid item xs={10} container spacing={2}>
-                {vocabWords.map((id) => (
-                  <Grid key={id} item xs={12} md={6} xl={4}>
-                    <VocabCard id={id} />
-                  </Grid>
-                ))}
-                <Grid item xs={12} md={6} xl={4}>
-                  <AddVocabWordCard />
-                </Grid>
+        {/*  body */}
+        <Grid container>
+          <Grid item xs={1} />
+          <Grid item xs={10} container spacing={2}>
+            {vocabWords.map((id) => (
+              <Grid key={id} item xs={12} md={6} xl={4}>
+                <VocabCard id={id} />
               </Grid>
-              <Grid item xs={1} />
+            ))}
+            <Grid item xs={12} md={6} xl={4}>
+              <AddVocabWordCard />
             </Grid>
-          </>
-        )}
+          </Grid>
+          <Grid item xs={1} />
+        </Grid>
       </BodyWrapper>
     </CollectionsBase>
   );

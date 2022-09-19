@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use chrono::Utc;
-use diesel::{Connection, QueryDsl, RunQueryDsl};
+use diesel::{Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
 use tracing::{error, info};
 
 use crate::{
@@ -60,6 +60,20 @@ impl Collection {
             collections::dsl::collections
                 .find(collection_id)
                 .first(pool.deref())
+        })
+        .map_err(StorageError::from)
+    }
+
+    pub async fn get_collections(
+        pool: &DbPool,
+        user_id: String,
+    ) -> Result<Vec<Collection>, StorageError> {
+        let pool = pool.get()?;
+
+        pool.transaction(|| {
+            collections::dsl::collections
+                .filter(collections::user_id.eq(user_id))
+                .get_results(pool.deref())
         })
         .map_err(StorageError::from)
     }

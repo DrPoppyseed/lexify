@@ -1,4 +1,4 @@
-import { atom, atomFamily, useRecoilCallback } from "recoil";
+import { atom, atomFamily, useRecoilCallback, useSetRecoilState } from "recoil";
 import { nanoid } from "nanoid";
 import { Collection } from "../domain/types";
 
@@ -34,6 +34,23 @@ export const useCreateCollection = () =>
       },
     []
   );
+
+export const useCreateCollectionSync = () => {
+  const setCollections = useSetRecoilState(collectionsState);
+
+  const addCollection = useRecoilCallback(
+    ({ set }) =>
+      (newCollection: Collection) => {
+        set(collectionState(newCollection.id), newCollection);
+      }
+  );
+
+  return (newCollection: Collection) => {
+    setCollections((currVal) => [...currVal, newCollection.id]);
+    addCollection(newCollection);
+    return newCollection;
+  };
+};
 
 export const useRemoveCollection = () =>
   useRecoilCallback(({ set, reset }) => (id: string) => {

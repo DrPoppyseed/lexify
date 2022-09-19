@@ -31,7 +31,7 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
       name: collection.name,
       description: collection.description,
     });
-  }, [reset, id]);
+  }, [reset, id, collection.name, collection.description]);
 
   const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
     setCollection((prev) =>
@@ -47,12 +47,10 @@ const CollectionEditor: FC<{ id: string }> = ({ id }) => {
       <EditableTitle
         onSubmit={() => handleSubmit(onSubmit)()}
         register={register("name")}
-        // placeholder={collection.title}
       />
       <EditableTypographyBase
         onSubmit={() => handleSubmit(onSubmit)()}
         register={register("description")}
-        // placeholder={collection.description}
       />
     </CollectionEditorBase>
   );

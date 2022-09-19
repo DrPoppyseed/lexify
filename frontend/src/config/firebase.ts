@@ -11,8 +11,6 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_MEASUREMENT_ID,
 };
 
-console.log("firebaseConfig: ", firebaseConfig);
-
 export const firebaseApp = initializeApp(firebaseConfig);
 export const githubAuthProvider = new GithubAuthProvider();
 export const googleAuthProvider = new GoogleAuthProvider();

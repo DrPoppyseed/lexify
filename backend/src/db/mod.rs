@@ -9,7 +9,7 @@ pub mod schema;
 pub mod user;
 
 #[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone)]
-#[table_name = "users"]
+#[diesel(table_name = users)]
 pub struct User {
     pub id:         String,
     pub created_at: NaiveDateTime,
@@ -17,7 +17,7 @@ pub struct User {
 }
 
 #[derive(AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug)]
-#[table_name = "collections"]
+#[diesel(table_name = collections)]
 pub struct Collection {
     pub id:          String,
     pub user_id:     String,
@@ -28,7 +28,7 @@ pub struct Collection {
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
-#[table_name = "vocab_words"]
+#[diesel(table_name = vocab_words)]
 pub struct Word {
     pub id:            String,
     pub collection_id: String,

@@ -37,7 +37,7 @@ pub async fn setup() -> (DbPool, Client, MockServer) {
 }
 
 async fn cleanup(db_pool: &DbPool) {
-    let conn = db_pool.get().unwrap();
+    let mut conn = db_pool.get().unwrap();
 
     conn.batch_execute(
         r#"

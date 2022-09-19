@@ -1,8 +1,6 @@
-use std::ops::Deref;
-
 use chrono::Utc;
 use diesel::{Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
-use tracing::{error, info};
+use tracing::error;
 
 use crate::{
     api,
@@ -15,13 +13,10 @@ impl Collection {
         pool: &DbPool,
         new_collection: api::Collection,
     ) -> Result<usize, StorageError> {
-        let pool = pool.get().map_err(|e| {
-            info!("[DB][insert_collection] Failed to get database connection from pool: {:#?}", e);
-            StorageError::from(e)
-        })?;
+        let mut pool = pool.get()?;
 
         let created_at = Utc::now().naive_utc();
-        pool.transaction(|| {
+        pool.transaction(|conn| {
             diesel::insert_into(collections::table)
                 .values(Collection {
                     id: new_collection.id.clone(),
@@ -31,7 +26,7 @@ impl Collection {
                     created_at,
                     updated_at: created_at,
                 })
-                .execute(pool.deref())
+                .execute(conn)
         })
         .map_err(|e| {
             error!("[DB][insert_collection] {:#?}", e);
@@ -43,10 +38,10 @@ impl Collection {
         pool: &DbPool,
         collection: api::Collection,
     ) -> Result<usize, StorageError> {
-        let pool = pool.get()?;
+        let mut pool = pool.get()?;
         let updated_at = Utc::now().naive_utc();
 
-        pool.transaction(|| {
+        pool.transaction(|conn| {
             diesel::update(
                 collections::dsl::collections.find(collection.id.clone()),
             )
@@ -55,7 +50,7 @@ impl Collection {
                 collections::description.eq(collection.description),
                 collections::updated_at.eq(updated_at),
             ))
-            .execute(pool.deref())
+            .execute(conn)
         })
         .map_err(StorageError::from)
     }
@@ -64,12 +59,12 @@ impl Collection {
         pool: &DbPool,
         collection_id: String,
     ) -> Result<Collection, StorageError> {
-        let pool = pool.get()?;
+        let mut pool = pool.get()?;
 
-        pool.transaction(|| {
+        pool.transaction(|conn| {
             collections::dsl::collections
                 .find(collection_id)
-                .first(pool.deref())
+                .first(conn)
         })
         .map_err(StorageError::from)
     }
@@ -78,12 +73,12 @@ impl Collection {
         pool: &DbPool,
         user_id: String,
     ) -> Result<Vec<Collection>, StorageError> {
-        let pool = pool.get()?;
+        let mut pool = pool.get()?;
 
-        pool.transaction(|| {
+        pool.transaction(|conn| {
             collections::dsl::collections
                 .filter(collections::user_id.eq(user_id))
-                .get_results(pool.deref())
+                .get_results(conn)
         })
         .map_err(StorageError::from)
     }

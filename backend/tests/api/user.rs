@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use diesel::{connection::SimpleConnection, Connection, QueryDsl, RunQueryDsl};
 use rocket::{
     http::{ContentType, Status},
@@ -35,12 +33,12 @@ async fn create_user_happy_path() {
     let res_body = res.into_json::<api::User>().await.unwrap();
     assert_eq!(res_body.id, USER_ID);
 
-    let conn = db_pool.get().unwrap();
+    let mut conn = db_pool.get().unwrap();
     let user_in_db = conn
-        .transaction(|| {
+        .transaction(|conn| {
             db::schema::users::dsl::users
                 .find(USER_ID)
-                .get_result::<db::User>(conn.deref())
+                .get_result::<db::User>(conn)
         })
         .unwrap();
     assert_eq!(user_in_db.id, USER_ID);
@@ -49,8 +47,8 @@ async fn create_user_happy_path() {
 #[rocket::async_test]
 async fn get_user() {
     let (db_pool, client, _) = setup().await;
-    let conn = db_pool.get().unwrap();
 
+    let mut conn = db_pool.get().unwrap();
     conn.batch_execute(&format!(
         "INSERT INTO users VALUES ('{USER_ID}', NOW(), NOW());"
     ))

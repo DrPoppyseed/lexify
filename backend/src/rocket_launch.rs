@@ -1,7 +1,9 @@
 use std::{env, str::FromStr};
 
-use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use diesel_tracing::mysql::InstrumentedMysqlConnection;
+use diesel::{
+    r2d2::{ConnectionManager, Pool, PooledConnection},
+    MysqlConnection,
+};
 use dotenv;
 use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, CorsOptions};
@@ -11,9 +13,8 @@ use crate::{
     auth::{FirebaseConfig, JwtConfig},
 };
 
-pub type DbPool = Pool<ConnectionManager<InstrumentedMysqlConnection>>;
-pub type DbPooled =
-    PooledConnection<ConnectionManager<InstrumentedMysqlConnection>>;
+pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
+pub type DbPooled = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 pub struct ServerState {
     pub db_pool:        DbPool,
@@ -28,9 +29,7 @@ pub fn establish_connection_pool(env_filename: &str) -> DbPool {
         .expect("Failed to retrieve environment value DB_URL.");
 
     Pool::builder()
-        .build(ConnectionManager::<InstrumentedMysqlConnection>::new(
-            database_url,
-        ))
+        .build(ConnectionManager::<MysqlConnection>::new(database_url))
         .expect("Failed to establish database connection pool.")
 }
 

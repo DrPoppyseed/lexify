@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use diesel::{Connection, QueryDsl, RunQueryDsl};
 use rocket::{
     http::{Header, Status},
@@ -82,12 +80,12 @@ async fn create_collection_happy_path() {
     assert!(res.body().is_none());
     assert_eq!(res.status(), Status { code: 201 });
 
-    let conn = db_pool.get().unwrap();
+    let mut conn = db_pool.get().unwrap();
     let collection_in_db = conn
-        .transaction(|| {
+        .transaction(|conn| {
             db::schema::collections::dsl::collections
                 .find(COL_ID)
-                .get_result::<db::Collection>(conn.deref())
+                .get_result::<db::Collection>(conn)
         })
         .unwrap();
 
@@ -127,12 +125,12 @@ async fn update_collection_happy_path() {
     call_create_collection(&client).await;
     call_update_collection(&client).await;
 
-    let conn = db_pool.get().unwrap();
+    let mut conn = db_pool.get().unwrap();
     let collection_in_db = conn
-        .transaction(|| {
+        .transaction(|conn| {
             db::schema::collections::dsl::collections
                 .find(COL_ID)
-                .get_result::<db::Collection>(conn.deref())
+                .get_result::<db::Collection>(conn)
         })
         .unwrap();
 

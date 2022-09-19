@@ -16,7 +16,6 @@ serde = "1.0.138"
 serde_json = "1.0.82"
 tokio = "1.19.2"
 futures = "0.3.21"
-uuid = "1.1.2"
 jsonwebtoken = "8.1.1"
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "54fae0701dffbe5df686465780218644ee3fae5f" }
 diesel = { version = "1.4.8", features = ["r2d2", "mysql", "chrono"] }
@@ -25,7 +24,6 @@ chrono = { version = "0.4", features = ["serde"] }
 rocket = { version = "0.5.0-rc.1", features = ["json"] }
 base64 = "0.13.0"
 tracing = "0.1.36"
-tracing-subscriber = { version = "0.3.15", features = ["env-filter", "json"] }
 diesel-tracing = { version = "0.1.6", features = ["mysql"] }
 
 [dev-dependencies]

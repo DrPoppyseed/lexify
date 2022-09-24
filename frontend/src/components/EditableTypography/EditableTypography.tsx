@@ -46,5 +46,8 @@ export const EditableDefinition: FC<EditableTypographyProps> = ({
     register={register}
     placeholder={placeholder}
     textAlign="center"
+    maxRows={3}
+    multiline
+    enableEnter
   />
 );

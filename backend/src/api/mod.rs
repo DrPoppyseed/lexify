@@ -28,6 +28,7 @@ pub struct User {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Collection {
     pub id:          String,
+    #[serde(rename = "userId")]
     pub user_id:     String,
     pub name:        String,
     pub description: Option<String>,
@@ -36,11 +37,23 @@ pub struct Collection {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VocabWord {
     pub id:            String,
+    #[serde(rename = "collectionId")]
     pub collection_id: String,
     pub word:          String,
     pub definition:    String,
     pub fails:         i32,
     pub successes:     i32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CollectionWithVocabWords {
+    #[serde(rename = "collectionId")]
+    pub collection_id: String,
+    #[serde(rename = "userId")]
+    pub user_id:       String,
+    pub name:          String,
+    pub description:   Option<String>,
+    pub words:         Vec<VocabWord>,
 }
 
 #[derive(Debug)]

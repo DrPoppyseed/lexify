@@ -4,7 +4,6 @@ import { useRecoilValue } from "recoil";
 import { Clear } from "@mui/icons-material";
 import { Sides } from "../../types/Sides";
 import { isShakingState } from "../../state/vocabCardState";
-import { useRemoveVocabWord } from "../../state/vocabWordsState";
 
 type VocabCardFlipperBaseProps = {
   front: ReactNode;
@@ -22,14 +21,13 @@ const VocabCardFlipperBase: FC<VocabCardFlipperBaseProps> = ({
   side,
 }) => {
   const isShaking = useRecoilValue(isShakingState);
-  const removeVocabWord = useRemoveVocabWord();
 
   const alpha = 0.3;
   const direction = "hor";
 
   const onRemoveVocabCardClicked = (e?: MouseEvent<HTMLDivElement>) => {
     e?.stopPropagation();
-    removeVocabWord(id);
+    // TODO: Remove vocab card
   };
 
   return (

@@ -20,7 +20,12 @@ use crate::{
 };
 
 pub fn routes() -> Vec<Route> {
-    routes![get_collections, create_collection, update_collection]
+    routes![
+        get_collection,
+        get_collections,
+        create_collection,
+        update_collection
+    ]
 }
 
 #[get("/")]
@@ -107,4 +112,63 @@ pub async fn update_collection(
             })
             .await
     }
+}
+
+#[get("/<collection_id>")]
+pub async fn get_collection(
+    collection_id: &str,
+    state: &State<ServerState>,
+    token: BearerToken,
+) -> Result<api::ApiResponse<api::CollectionWithVocabWords>, HttpError> {
+    info!("[API][get_collection] function triggered!");
+
+    api::get_uid_from_token(state, &token)
+        .map_err(|_| HttpError::unauthorized())
+        .and_then(|uid| async move {
+            db::Collection::get_collection(&state.db_pool, collection_id)
+                .map_err(HttpError::from)
+                .await
+                .and_then(|collection| {
+                    if uid == collection.user_id {
+                        Ok(collection)
+                    } else {
+                        Err(HttpError::forbidden())
+                    }
+                })
+        })
+        .and_then(|collection| {
+            db::VocabWord::get_vocab_words_for_collection(
+                &state.db_pool,
+                collection_id,
+            )
+            .map_err(HttpError::from)
+            .map_ok(|vocab_words| (collection, vocab_words))
+        })
+        .map_ok(|(collection, vocab_words)| {
+            let api_vocab_words = vocab_words
+                .into_iter()
+                .map(|vocab_word| api::VocabWord {
+                    id:            vocab_word.id,
+                    collection_id: vocab_word.collection_id,
+                    word:          vocab_word.word,
+                    definition:    vocab_word.definition.unwrap_or_default(),
+                    fails:         vocab_word.fails,
+                    successes:     vocab_word.successes,
+                })
+                .collect();
+
+            (collection, api_vocab_words)
+        })
+        .map_ok(|(collection, vocab_words)| api::CollectionWithVocabWords {
+            collection_id: collection.id,
+            user_id:       collection.user_id,
+            name:          collection.name,
+            description:   collection.description,
+            words:         vocab_words,
+        })
+        .map_ok(|response_body| api::ApiResponse {
+            json:   Some(Json(response_body)),
+            status: Status::Ok,
+        })
+        .await
 }

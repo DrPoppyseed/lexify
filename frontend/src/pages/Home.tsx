@@ -1,44 +1,27 @@
 import { AppBar, Grid, styled } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import VocabCard from "../components/VocabCard/VocabCard";
 import AddVocabWordCard from "../components/VocabCard/AddVocabWordCard";
-import { vocabWordsState } from "../state/vocabWordsState";
 import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
 import { isDrawerOpenState } from "../state/pageState";
 import Drawer from "../components/Drawer/Drawer";
-import CollectionEditor from "../components/CollectionEditor/CollectionEditor";
+import CollectionEditor from "../components/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import {
-  currentCollectionState,
-  useCreateCollectionSync,
-  useSetCollections,
-} from "../state/collectionsState";
-import { collectionFactory } from "../domain/collection";
-import { useGetCollections } from "../hooks/useCollection";
+import { useGetCollection, useGetCollections } from "../hooks/useCollection";
 
 const Home = () => {
-  const vocabWords = useRecoilValue(vocabWordsState);
+  const isDrawerOpen = useRecoilValue(isDrawerOpenState);
   const params = useParams();
-  const createCollectionSync = useCreateCollectionSync();
   const { getItemFromLocalStorage, setItemToLocalStorage } = useLocalStorage();
-  const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
   const [isShaking, setIsShaking] = useRecoilState(isShakingState);
-  const [currentCollection, setCurrentCollection] = useRecoilState(
-    currentCollectionState
-  );
-  const { data, isSuccess } = useGetCollections();
-  const setCollections = useSetCollections();
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      setCollections(data);
-    }
-  }, [setCollections, data, isSuccess]);
-
-  const drawerWidth = 30;
+  const { data: collectionsData, isSuccess: getCollectionsIsSuccess } =
+    useGetCollections();
+  const { data: collectionData, isSuccess: getCollectionIsSuccess } =
+    useGetCollection(params?.id);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // try to retrieve latest accessed collection from localStorage if collection id is not specified
@@ -46,13 +29,10 @@ const Home = () => {
       const lastAccessedCollectionId = getItemFromLocalStorage(
         "latestAccessedCollectionId"
       );
-      if (lastAccessedCollectionId && !currentCollection) {
-        setCurrentCollection(lastAccessedCollectionId);
+      if (lastAccessedCollectionId) {
+        navigate(`/${lastAccessedCollectionId}`);
       } else {
-        const collection = collectionFactory();
-        createCollectionSync(collection);
-        setCurrentCollection(collection.id);
-        setItemToLocalStorage("latestAccessedCollectionId", collection.id);
+        console.log("TODO: just create a new collection");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,36 +50,54 @@ const Home = () => {
         position="fixed"
         elevation={0}
         isDrawerOpen={isDrawerOpen}
-        drawerWidth={drawerWidth}
+        drawerWidth={30}
       >
         <Header />
       </HeaderWrapper>
-      <Drawer width={drawerWidth} />
-      <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={drawerWidth}>
-        {/*  header */}
-        <CollectionEditorWrapper container>
-          <Grid item xs={1} />
-          <Grid item xs={10}>
-            <CollectionEditor id={params.id || (currentCollection as string)} />
-          </Grid>
-          <Grid item xs={1} />
-        </CollectionEditorWrapper>
-
-        {/*  body */}
-        <Grid container>
-          <Grid item xs={1} />
-          <Grid item xs={10} container spacing={2}>
-            {vocabWords.map((id) => (
-              <Grid key={id} item xs={12} md={6} xl={4}>
-                <VocabCard id={id} />
+      {collectionsData ? (
+        <Drawer collections={collectionsData} />
+      ) : (
+        <div>Loading...</div>
+      )}
+      <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={30}>
+        {params?.id && collectionData ? (
+          <>
+            {/*  header */}
+            <CollectionEditorWrapper container>
+              <Grid item xs={1} />
+              <Grid item xs={10}>
+                <CollectionEditor
+                  {...collectionData}
+                  id={collectionData.collectionId}
+                />
               </Grid>
-            ))}
-            <Grid item xs={12} md={6} xl={4}>
-              <AddVocabWordCard />
+              <Grid item xs={1} />
+            </CollectionEditorWrapper>
+
+            {/*  body */}
+            <Grid container>
+              <Grid item xs={1} />
+              <Grid item xs={10} container spacing={2}>
+                {collectionData?.words.map((vocabWord) => (
+                  <Grid key={vocabWord.id} item xs={12} md={6} xl={4}>
+                    <VocabCard
+                      vocabWord={vocabWord}
+                      collectionId={collectionData.collectionId}
+                    />
+                  </Grid>
+                ))}
+                <Grid item xs={12} md={6} xl={4}>
+                  <AddVocabWordCard
+                    collectionId={collectionData.collectionId}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item xs={1} />
             </Grid>
-          </Grid>
-          <Grid item xs={1} />
-        </Grid>
+          </>
+        ) : (
+          <div>Loading...</div>
+        )}
       </BodyWrapper>
     </CollectionsBase>
   );

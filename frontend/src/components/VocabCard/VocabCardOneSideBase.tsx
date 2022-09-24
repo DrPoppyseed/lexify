@@ -55,6 +55,7 @@ const CardBase = styled(Card)`
   justify-content: center;
   position: relative;
   height: ${({ theme }) => theme.spacing(16)};
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 export default VocabCardOneSideBase;

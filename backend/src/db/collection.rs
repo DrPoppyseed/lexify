@@ -54,7 +54,7 @@ impl db::Collection {
 
     pub async fn get_collection(
         pool: &DbPool,
-        collection_id: String,
+        collection_id: &str,
     ) -> Result<db::Collection, db::StorageError> {
         let mut pool = pool.get()?;
 

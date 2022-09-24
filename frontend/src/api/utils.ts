@@ -1,7 +1,11 @@
-import type { Option } from "../types/utils";
+import { getAuth } from "firebase/auth";
 
-export const authHeader = (token: Option<string>) => ({
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+export const authHeader = async () => {
+  const token = await getAuth()?.currentUser?.getIdToken();
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};

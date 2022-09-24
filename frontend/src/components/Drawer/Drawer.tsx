@@ -9,15 +9,17 @@ import {
   SwipeableDrawer,
 } from "@mui/material";
 import { Add, Menu } from "@mui/icons-material";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { isDrawerOpenState } from "../../state/pageState";
-import { collectionsState } from "../../state/collectionsState";
 import DrawerItem from "./DrawerItem";
 import { useCreateCollection } from "../../hooks/useCollection";
+import { Collection } from "../../api/types";
 
-const Drawer: FC<{ width?: number }> = ({ width = 30 }) => {
+const Drawer: FC<{
+  collections: ReadonlyArray<Collection>;
+  width?: number;
+}> = ({ collections, width = 30 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
-  const collections = useRecoilValue(collectionsState);
   const { createCollection } = useCreateCollection();
 
   const onClickCreateCollection = async () => {
@@ -39,8 +41,8 @@ const Drawer: FC<{ width?: number }> = ({ width = 30 }) => {
         </IconButton>
       </DrawerHeader>
       <MenuList>
-        {collections.map((id) => (
-          <DrawerItem key={id} id={id} />
+        {collections.map((collection) => (
+          <DrawerItem key={collection.id} collection={collection} />
         ))}
         <MenuItem onClick={onClickCreateCollection}>
           <ListItemIcon>

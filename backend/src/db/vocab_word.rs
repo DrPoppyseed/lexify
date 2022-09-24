@@ -11,8 +11,6 @@ impl db::VocabWord {
     ) -> Result<usize, db::StorageError> {
         let mut pool = pool.get()?;
 
-        println!("vocab_word: {:#?}", vocab_word);
-
         let created_at = Utc::now().naive_utc();
         pool.transaction(|conn| {
             diesel::insert_into(db::schema::vocab_words::table)
@@ -59,5 +57,21 @@ impl db::VocabWord {
             error!("[DB][insert_vocab_word] {:#?}", e);
             db::StorageError::from(e)
         })
+    }
+
+    pub async fn get_vocab_words_for_collection(
+        pool: &DbPool,
+        collection_id: &str,
+    ) -> Result<Vec<db::VocabWord>, db::StorageError> {
+        let mut pool = pool.get()?;
+
+        pool.transaction(|conn| {
+            db::schema::vocab_words::dsl::vocab_words
+                .filter(
+                    db::schema::vocab_words::collection_id.eq(collection_id),
+                )
+                .get_results(conn)
+        })
+        .map_err(db::StorageError::from)
     }
 }

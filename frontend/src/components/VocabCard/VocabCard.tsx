@@ -4,37 +4,31 @@ import { Check, QuestionMark } from "@mui/icons-material";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRecoilState } from "recoil";
 import produce from "immer";
 import VocabCardFlipperBase from "./VocabCardFlipperBase";
-import type { VocabWord } from "../../domain/types";
-import { vocabWordState } from "../../state/vocabWordsState";
 import VocabCardOneSideBase from "./VocabCardOneSideBase";
 import { Sides } from "../../types/Sides";
 import {
   EditableDefinition,
   EditableWord,
 } from "../EditableTypography/EditableTypography";
-
-type VocabWordCardProps = {
-  id: string;
-};
+import { useUpdateVocabWord } from "../../hooks/useVocabWord";
+import { VocabWord } from "../../api/types";
 
 const vocabWordSchema = z.object({
   word: z.string().min(1).max(255),
   definition: z.string().max(255),
 });
 
-export type VocabWordForm = z.infer<typeof vocabWordSchema>;
-
-const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
-  const [vocabWord, setVocabWord] = useRecoilState(vocabWordState(id));
+const VocabCard: FC<{
+  vocabWord: VocabWord;
+  collectionId: string;
+}> = ({ vocabWord, collectionId }) => {
   const [side, setSide] = useState<Sides>("front");
-
-  // const asyncUpdateVocabCard = useMutation((vocabWord: VocabWord) => {
-  //   const TEMP_collectionId = "temp_collection_id";
-  //   return api.post(`/collections/${TEMP_collectionId}/words/${id}`, vocabWord);
-  // });
+  const [tally, setTally] = useState<Pick<VocabWord, "fails" | "successes">>({
+    ...vocabWord,
+  });
+  const { updateVocabWord } = useUpdateVocabWord();
 
   const { register, handleSubmit } = useForm<VocabWord>({
     resolver: zodResolver(vocabWordSchema),
@@ -43,38 +37,36 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
     },
   });
 
-  const onSubmit: SubmitHandler<VocabWord> = (formData) => {
-    const updatedVocabCard = produce(vocabWord, (draft) => {
+  const onSubmit: SubmitHandler<VocabWord> = async (formData) => {
+    const updatedVocabWord = produce(vocabWord, (draft) => {
       draft.word = formData.word;
       draft.definition = formData.definition;
     });
-
-    setVocabWord(updatedVocabCard);
-    console.log("updated: ", updatedVocabCard);
+    await updateVocabWord(collectionId, updatedVocabWord);
   };
 
   const onVocabWordNotKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
-    setVocabWord((prevVocabWord) =>
-      produce(prevVocabWord, (draft) => {
-        draft.fails++;
-      })
-    );
+    setTally((prev) => ({ ...prev, fails: prev.fails + 1 }));
+    updateVocabWord(collectionId, {
+      ...vocabWord,
+      fails: vocabWord.fails + 1,
+    });
   };
 
   const onVocabWordKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
-    setVocabWord((prevVocabWord) =>
-      produce(prevVocabWord, (draft) => {
-        draft.successes++;
-      })
-    );
+    setTally((prev) => ({ ...prev, successes: prev.successes + 1 }));
+    updateVocabWord(collectionId, {
+      ...vocabWord,
+      successes: vocabWord.successes + 1,
+    });
   };
 
   return (
     <VocabCardFlipperBase
       side={side}
-      id={id}
+      id={vocabWord.id}
       front={
         <VocabCardOneSideBase setSide={setSide}>
           <NotKnowsWordButton onClick={onVocabWordNotKnownClicked}>
@@ -85,9 +77,9 @@ const VocabCard: FC<VocabWordCardProps> = ({ id }) => {
             register={register("word")}
           />
           <Tally>
-            <Typography variant="caption">{vocabWord.fails}</Typography>
+            <Typography variant="caption">{tally.fails}</Typography>
             &nbsp;-&nbsp;
-            <Typography variant="caption">{vocabWord.successes}</Typography>
+            <Typography variant="caption">{tally.successes}</Typography>
           </Tally>
           <KnowsWordButton onClick={onVocabWordKnownClicked}>
             <Check color="success" />

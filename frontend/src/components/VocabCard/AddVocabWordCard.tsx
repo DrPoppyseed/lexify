@@ -4,21 +4,14 @@ import {
   styled,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { useCreateVocabWord } from "../../state/vocabWordsState";
+import { FC } from "react";
+import { useCreateVocabWord } from "../../hooks/useVocabWord";
 
-const AddVocabWordCard = () => {
-  const createVocabWord = useCreateVocabWord();
+const AddVocabWordCard: FC<{ collectionId: string }> = ({ collectionId }) => {
+  const { createVocabWord } = useCreateVocabWord();
 
   return (
-    <Card
-      elevation={0}
-      onClick={() =>
-        createVocabWord({
-          word: "",
-          definition: "",
-        })
-      }
-    >
+    <Card elevation={0} onClick={() => createVocabWord(collectionId)}>
       <CardActionArea>
         <Add fontSize="large" color="disabled" />
       </CardActionArea>
@@ -27,7 +20,7 @@ const AddVocabWordCard = () => {
 };
 
 const Card = styled(MuiCard)`
-  height: ${(props) => props.theme.spacing(16)};
+  height: ${(p) => p.theme.spacing(16)};
   background-color: #fffcf7;
 `;
 

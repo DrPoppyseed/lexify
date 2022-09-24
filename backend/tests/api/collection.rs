@@ -10,6 +10,7 @@ use lexify_api::{api, db};
 use crate::{
     mocks::mock_jwk_issuer,
     utils::{auth_header, setup},
+    vocab_word::call_create_vocab_word,
 };
 
 static USER_ID: &str = "test_user_id";
@@ -58,6 +59,14 @@ async fn call_update_collection(client: &Client) -> LocalResponse {
         .put("/collections")
         .header(auth_header(USER_ID))
         .json(&req_body)
+        .dispatch()
+        .await
+}
+
+async fn call_get_collection(client: &Client) -> LocalResponse {
+    client
+        .get(format!("/collections/{COL_ID}"))
+        .header(auth_header(USER_ID))
         .dispatch()
         .await
 }
@@ -133,4 +142,35 @@ async fn update_collection_happy_path() {
         Some("updated test description".to_string())
     );
     assert_eq!(collection_in_db.name, "updated test name".to_string())
+}
+
+#[rocket::async_test]
+async fn get_collection_happy_path() {
+    let (_, client, mock_server) = setup().await;
+
+    mock_jwk_issuer().expect(3).mount(&mock_server).await;
+    call_create_collection(&client).await;
+    call_create_vocab_word(&client).await;
+    let res = call_get_collection(&client).await;
+    let res_body = res
+        .into_json::<api::CollectionWithVocabWords>()
+        .await
+        .unwrap();
+
+    let desired_body = api::CollectionWithVocabWords {
+        collection_id: COL_ID.to_string(),
+        user_id:       USER_ID.to_string(),
+        name:          COL_NAME.to_string(),
+        description:   Some(COL_DESC.to_string()),
+        words:         vec![api::VocabWord {
+            id:            "test_vocab_word_id".to_string(),
+            collection_id: COL_ID.to_string(),
+            word:          "test_vocab_word_word".to_string(),
+            definition:    "test_vocab_word_definition".to_string(),
+            fails:         0,
+            successes:     0,
+        }],
+    };
+
+    assert!(matches!(res_body, desired_body));
 }

@@ -21,6 +21,8 @@ export type EditableTypographyBaseProps = {
   fontSize?: number;
   textDecoration?: TextDecoration;
   enableEnter?: boolean;
+  multiline?: boolean;
+  maxRows?: number;
 };
 
 // Inspired by https://stackoverflow.com/a/1037385/11435461
@@ -32,6 +34,8 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
   fontSize = 16,
   textDecoration = "inherit",
   enableEnter = true,
+  multiline = false,
+  maxRows = 3,
 }) => {
   let currentTimeout = 0;
 
@@ -87,13 +91,11 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
       sx={{ textDecoration }}
       placeholder={placeholder}
       autoFocus
-      multiline
+      fullWidth
+      multiline={multiline}
+      maxRows={maxRows}
     />
   );
 };
-
-// const EditableTypographyBase = styled(TextField)`
-//  text-align: center;
-// `;
 
 export default EditableTypographyBase;

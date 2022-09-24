@@ -3,12 +3,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect } from "react";
-import { useRecoilState } from "recoil";
-import { EditableTitle } from "../EditableTypography/EditableTypography";
-import EditableTypographyBase from "../EditableTypography/EditableTypographyBase";
-import { collectionState } from "../../state/collectionsState";
-import { Collection } from "../../domain/types";
-import { useUpdateCollection } from "../../hooks/useCollection";
+import { EditableTitle } from "./EditableTypography/EditableTypography";
+import EditableTypographyBase from "./EditableTypography/EditableTypographyBase";
+import { useUpdateCollection } from "../hooks/useCollection";
+import { Collection } from "../api/types";
+import { Option } from "../types/utils";
 
 const collectionEditorSchema = z.object({
   name: z.string().max(50),
@@ -17,31 +16,35 @@ const collectionEditorSchema = z.object({
 
 export type CollectionEditorForm = z.infer<typeof collectionEditorSchema>;
 
-const CollectionEditor: FC<{ id: string }> = ({ id }) => {
+const CollectionEditor: FC<{
+  id: string;
+  userId: string;
+  name: string;
+  description: Option<string>;
+}> = ({ id, userId, name, description }) => {
   const { updateCollection } = useUpdateCollection();
-  const [collection, setCollection] = useRecoilState(collectionState(id));
   const { reset, register, handleSubmit } = useForm<CollectionEditorForm>({
     resolver: zodResolver(collectionEditorSchema),
     defaultValues: {
-      name: collection.name,
-      description: collection.description,
+      name,
+      description,
     },
   });
 
   useEffect(() => {
     reset({
-      name: collection.name,
-      description: collection.description,
+      name,
+      description,
     });
-  }, [reset, id, collection.name, collection.description]);
+  }, [reset, name, description]);
 
-  const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
+  const onSubmit: SubmitHandler<CollectionEditorForm> = async (formData) => {
     const updatedCollection: Collection = {
-      ...collection,
+      id,
+      userId,
       ...formData,
     };
-    setCollection(updatedCollection);
-    updateCollection(updatedCollection);
+    await updateCollection(updatedCollection);
   };
 
   return (

@@ -17,7 +17,7 @@ static VW_ID: &str = "test_vocab_word_id";
 static VW_WORD: &str = "test_vocab_word_word";
 static VW_DEF: &str = "test_vocab_word_definition";
 
-async fn call_create_vocab_word(client: &Client) -> LocalResponse {
+pub async fn call_create_vocab_word(client: &Client) -> LocalResponse {
     let req_body = api::VocabWord {
         id:            VW_ID.to_string(),
         collection_id: COL_ID.to_string(),
@@ -60,8 +60,6 @@ async fn insert_vocab_word_happy_path() {
     mock_jwk_issuer().expect(1).mount(&mock_server).await;
 
     let res = call_create_vocab_word(&client).await;
-
-    println!("res: {:#?}", res);
 
     assert!(res.body().is_none());
     assert_eq!(res.status(), Status { code: 201 });

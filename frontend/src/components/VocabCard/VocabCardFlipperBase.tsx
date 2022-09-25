@@ -44,7 +44,7 @@ const VocabCardFlipperBase: FC<VocabCardFlipperBaseProps> = ({
       </FlipCardContainer>
 
       {isShaking && (
-        <RemoveCardButton onClick={onRemoveVocabCardClicked}>
+        <RemoveCardButton onClick={(e) => onRemoveVocabCardClicked(e)}>
           <Clear fontSize="small" color="disabled" />
         </RemoveCardButton>
       )}

@@ -4,15 +4,10 @@ import { useRecoilState } from "recoil";
 import { isShakingState } from "../../state/vocabCardState";
 import { Sides } from "../../types/Sides";
 
-type VocabCardOneSideBaseProps = {
+const VocabCardOneSideBase: FC<{
   children: ReactNode;
   setSide: (side: Sides | ((prev: Sides) => Sides)) => void;
-};
-
-const VocabCardOneSideBase: FC<VocabCardOneSideBaseProps> = ({
-  setSide,
-  children,
-}) => {
+}> = ({ setSide, children }) => {
   const [isShaking, setIsShaking] = useRecoilState(isShakingState);
 
   let currentTimeout = 0;

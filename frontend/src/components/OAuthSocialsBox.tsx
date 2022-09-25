@@ -27,11 +27,11 @@ const OAuthSocialsBox: FC<Props> = ({ variant }) => {
       <Typography variant="h3">
         <b>{variant}</b>
       </Typography>
-      <FlatButton onClick={googleOAuth}>
+      <FlatButton onClick={() => googleOAuth()}>
         <Google />
         <Typography>{variant} with Google</Typography>
       </FlatButton>
-      <FlatButton onClick={githubOAuth}>
+      <FlatButton onClick={() => githubOAuth()}>
         <GitHub />
         <Typography>{variant} with Github</Typography>
       </FlatButton>

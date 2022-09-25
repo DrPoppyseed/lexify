@@ -7,6 +7,7 @@ use rocket::{
 use lexify_api::{api, db};
 
 use crate::{
+    collection::call_create_collection,
     mocks::mock_jwk_issuer,
     utils::{auth_header, setup},
 };
@@ -53,6 +54,39 @@ async fn call_update_vocab_word(client: &Client) -> LocalResponse {
         .await
 }
 
+async fn call_get_vocab_words(client: &Client) -> LocalResponse {
+    client
+        .get(format!("/vocab_words/{COL_ID}"))
+        .header(auth_header(USER_ID))
+        .dispatch()
+        .await
+}
+
+#[rocket::async_test]
+async fn get_vocab_words_happy_path() {
+    let (_, client, mock_server) = setup().await;
+
+    mock_jwk_issuer().expect(3).mount(&mock_server).await;
+
+    call_create_collection(&client).await;
+    call_create_vocab_word(&client).await;
+    let res = call_get_vocab_words(&client).await;
+
+    assert_eq!(res.status(), Status { code: 200 });
+
+    let res_body = res.into_json::<Vec<api::VocabWord>>().await.unwrap();
+    let desired_body = vec![api::VocabWord {
+        id:            VW_ID.to_string(),
+        collection_id: COL_ID.to_string(),
+        word:          VW_WORD.to_string(),
+        definition:    VW_DEF.to_string(),
+        fails:         0,
+        successes:     0,
+    }];
+
+    assert!(matches!(res_body, desired_body));
+}
+
 #[rocket::async_test]
 async fn insert_vocab_word_happy_path() {
     let (db_pool, client, mock_server) = setup().await;
@@ -61,7 +95,7 @@ async fn insert_vocab_word_happy_path() {
 
     let res = call_create_vocab_word(&client).await;
 
-    assert!(res.body().is_none());
+    assert!(res.body().is_some());
     assert_eq!(res.status(), Status { code: 201 });
 
     let mut conn = db_pool.get().unwrap();

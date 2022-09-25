@@ -28,7 +28,7 @@ const VocabCard: FC<{
   const [tally, setTally] = useState<Pick<VocabWord, "fails" | "successes">>({
     ...vocabWord,
   });
-  const { updateVocabWord } = useUpdateVocabWord();
+  const { updateVocabWord } = useUpdateVocabWord(collectionId);
 
   const { register, handleSubmit } = useForm<VocabWord>({
     resolver: zodResolver(vocabWordSchema),
@@ -42,13 +42,13 @@ const VocabCard: FC<{
       draft.word = formData.word;
       draft.definition = formData.definition;
     });
-    await updateVocabWord(collectionId, updatedVocabWord);
+    await updateVocabWord(updatedVocabWord);
   };
 
   const onVocabWordNotKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
     setTally((prev) => ({ ...prev, fails: prev.fails + 1 }));
-    updateVocabWord(collectionId, {
+    updateVocabWord({
       ...vocabWord,
       fails: vocabWord.fails + 1,
     });
@@ -57,7 +57,7 @@ const VocabCard: FC<{
   const onVocabWordKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
     setTally((prev) => ({ ...prev, successes: prev.successes + 1 }));
-    updateVocabWord(collectionId, {
+    updateVocabWord({
       ...vocabWord,
       successes: vocabWord.successes + 1,
     });
@@ -69,7 +69,7 @@ const VocabCard: FC<{
       id={vocabWord.id}
       front={
         <VocabCardOneSideBase setSide={setSide}>
-          <NotKnowsWordButton onClick={onVocabWordNotKnownClicked}>
+          <NotKnowsWordButton onClick={(e) => onVocabWordNotKnownClicked(e)}>
             <QuestionMark color="error" />
           </NotKnowsWordButton>
           <EditableWord
@@ -81,7 +81,7 @@ const VocabCard: FC<{
             &nbsp;-&nbsp;
             <Typography variant="caption">{tally.successes}</Typography>
           </Tally>
-          <KnowsWordButton onClick={onVocabWordKnownClicked}>
+          <KnowsWordButton onClick={(e) => onVocabWordKnownClicked(e)}>
             <Check color="success" />
           </KnowsWordButton>
         </VocabCardOneSideBase>

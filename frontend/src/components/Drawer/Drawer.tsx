@@ -44,7 +44,7 @@ const Drawer: FC<{
         {collections.map((collection) => (
           <DrawerItem key={collection.id} collection={collection} />
         ))}
-        <MenuItem onClick={onClickCreateCollection}>
+        <MenuItem onClick={() => onClickCreateCollection()}>
           <ListItemIcon>
             <Add fontSize="small" color="disabled" />
           </ListItemIcon>

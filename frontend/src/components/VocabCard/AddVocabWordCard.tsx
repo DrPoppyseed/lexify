@@ -8,10 +8,10 @@ import { FC } from "react";
 import { useCreateVocabWord } from "../../hooks/useVocabWord";
 
 const AddVocabWordCard: FC<{ collectionId: string }> = ({ collectionId }) => {
-  const { createVocabWord } = useCreateVocabWord();
+  const { createVocabWord } = useCreateVocabWord(collectionId);
 
   return (
-    <Card elevation={0} onClick={() => createVocabWord(collectionId)}>
+    <Card elevation={0} onClick={() => createVocabWord()}>
       <CardActionArea>
         <Add fontSize="large" color="disabled" />
       </CardActionArea>

@@ -8,6 +8,7 @@ use rocket::{
     State,
 };
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
 use crate::{
     auth::{AuthError, BearerToken, Jwt},
@@ -45,17 +46,6 @@ pub struct VocabWord {
     pub successes:     i32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CollectionWithVocabWords {
-    #[serde(rename = "collectionId")]
-    pub collection_id: String,
-    #[serde(rename = "userId")]
-    pub user_id:       String,
-    pub name:          String,
-    pub description:   Option<String>,
-    pub words:         Vec<VocabWord>,
-}
-
 #[derive(Debug)]
 pub struct ApiResponse<T> {
     pub json:   Option<Json<T>>,
@@ -83,8 +73,14 @@ impl<'r, T: serde::Serialize> response::Responder<'r, 'r> for ApiResponse<T> {
 impl From<StorageError> for HttpError {
     fn from(e: StorageError) -> Self {
         match e {
-            StorageError::NotFoundError(_) => Self::not_found(),
-            StorageError::DatabaseError(_) => Self::internal_error(),
+            StorageError::NotFoundError(e) => {
+                error!("{:?}", e);
+                Self::not_found()
+            }
+            StorageError::DatabaseError(e) => {
+                error!("{:?}", e);
+                Self::internal_error()
+            }
         }
     }
 }

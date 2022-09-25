@@ -11,6 +11,7 @@ import Drawer from "../components/Drawer/Drawer";
 import CollectionEditor from "../components/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useGetCollection, useGetCollections } from "../hooks/useCollection";
+import { useGetVocabWords } from "../hooks/useVocabWord";
 
 const Home = () => {
   const isDrawerOpen = useRecoilValue(isDrawerOpenState);
@@ -21,6 +22,7 @@ const Home = () => {
     useGetCollections();
   const { data: collectionData, isSuccess: getCollectionIsSuccess } =
     useGetCollection(params?.id);
+  const { data: vocabWordsData } = useGetVocabWords(params?.id);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,10 +68,7 @@ const Home = () => {
             <CollectionEditorWrapper container>
               <Grid item xs={1} />
               <Grid item xs={10}>
-                <CollectionEditor
-                  {...collectionData}
-                  id={collectionData.collectionId}
-                />
+                <CollectionEditor {...collectionData} id={collectionData.id} />
               </Grid>
               <Grid item xs={1} />
             </CollectionEditorWrapper>
@@ -78,18 +77,16 @@ const Home = () => {
             <Grid container>
               <Grid item xs={1} />
               <Grid item xs={10} container spacing={2}>
-                {collectionData?.words.map((vocabWord) => (
+                {vocabWordsData?.map((vocabWord) => (
                   <Grid key={vocabWord.id} item xs={12} md={6} xl={4}>
                     <VocabCard
                       vocabWord={vocabWord}
-                      collectionId={collectionData.collectionId}
+                      collectionId={collectionData.id}
                     />
                   </Grid>
                 ))}
                 <Grid item xs={12} md={6} xl={4}>
-                  <AddVocabWordCard
-                    collectionId={collectionData.collectionId}
-                  />
+                  <AddVocabWordCard collectionId={collectionData.id} />
                 </Grid>
               </Grid>
               <Grid item xs={1} />

@@ -2,12 +2,12 @@ use chrono::NaiveDateTime;
 use diesel::{r2d2, result::Error, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
+use schema::{collections, users, vocab_words};
+
 pub mod collection;
 pub mod schema;
 pub mod user;
 pub mod vocab_word;
-
-use schema::{collections, users, vocab_words};
 
 #[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone)]
 #[diesel(table_name = users)]
@@ -28,7 +28,9 @@ pub struct Collection {
     pub updated_at:  NaiveDateTime,
 }
 
-#[derive(AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug)]
+#[derive(
+    AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug, Clone,
+)]
 #[diesel(table_name = vocab_words)]
 pub struct VocabWord {
     pub id:            String,

@@ -19,11 +19,3 @@ export type VocabWord = {
   fails: number;
   successes: number;
 };
-
-export type CollectionWithVocabWords = Pick<
-  Collection,
-  "userId" | "name" | "description"
-> & {
-  collectionId: string,
-  words: ReadonlyArray<VocabWord>
-}

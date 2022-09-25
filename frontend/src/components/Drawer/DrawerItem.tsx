@@ -14,7 +14,7 @@ const DrawerItem: FC<{ collection: Collection }> = ({ collection }) => {
   };
 
   return (
-    <MenuItem onClick={onDrawerItemClick}>
+    <MenuItem onClick={() => onDrawerItemClick()}>
       <ListItemText primary={collection.name} />
     </MenuItem>
   );

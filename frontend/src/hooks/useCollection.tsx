@@ -42,7 +42,7 @@ export const useUpdateCollection = () => {
 
 export const useGetCollections = () => {
   const { data, isLoading, isError, isSuccess } = useQuery(
-    ["getCollections"],
+    ["collections"],
     getCollectionsInAPI
   );
 
@@ -51,7 +51,7 @@ export const useGetCollections = () => {
 
 export const useGetCollection = (collectionId: Option<string>) => {
   const { data, isLoading, isError, isSuccess } = useQuery(
-    ["getCollection", collectionId],
+    ["collection", collectionId],
     () => getCollectionInAPI(collectionId as string),
     {
       enabled: !!collectionId,

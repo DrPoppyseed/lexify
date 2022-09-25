@@ -10,7 +10,6 @@ use lexify_api::{api, db};
 use crate::{
     mocks::mock_jwk_issuer,
     utils::{auth_header, setup},
-    vocab_word::call_create_vocab_word,
 };
 
 static USER_ID: &str = "test_user_id";
@@ -23,7 +22,7 @@ pub struct TestJwks {
     jwks: Vec<String>,
 }
 
-async fn call_create_collection(client: &Client) -> LocalResponse {
+pub async fn call_create_collection(client: &Client) -> LocalResponse {
     let req_body = api::Collection {
         id:          COL_ID.to_string(),
         user_id:     USER_ID.to_string(),
@@ -148,29 +147,17 @@ async fn update_collection_happy_path() {
 async fn get_collection_happy_path() {
     let (_, client, mock_server) = setup().await;
 
-    mock_jwk_issuer().expect(3).mount(&mock_server).await;
+    mock_jwk_issuer().expect(2).mount(&mock_server).await;
     call_create_collection(&client).await;
-    call_create_vocab_word(&client).await;
     let res = call_get_collection(&client).await;
-    let res_body = res
-        .into_json::<api::CollectionWithVocabWords>()
-        .await
-        .unwrap();
+    let res_body = res.into_json::<api::Collection>().await.unwrap();
 
-    let desired_body = api::CollectionWithVocabWords {
-        collection_id: COL_ID.to_string(),
-        user_id:       USER_ID.to_string(),
-        name:          COL_NAME.to_string(),
-        description:   Some(COL_DESC.to_string()),
-        words:         vec![api::VocabWord {
-            id:            "test_vocab_word_id".to_string(),
-            collection_id: COL_ID.to_string(),
-            word:          "test_vocab_word_word".to_string(),
-            definition:    "test_vocab_word_definition".to_string(),
-            fails:         0,
-            successes:     0,
-        }],
+    let desired_body = api::Collection {
+        id:          COL_ID.to_string(),
+        user_id:     USER_ID.to_string(),
+        name:        COL_NAME.to_string(),
+        description: Some(COL_DESC.to_string()),
     };
 
-    assert!(matches!(res_body, desired_body));
+    assert_eq!(res_body, desired_body);
 }

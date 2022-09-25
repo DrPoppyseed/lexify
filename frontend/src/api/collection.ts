@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { api } from "../config/axios";
-import type { Collection, CollectionWithVocabWords } from "./types";
+import type { Collection } from "./types";
 import { authHeader } from "./utils";
 
 export const createCollection = async (
@@ -29,10 +29,10 @@ export const updateCollection = async (
 
 export const getCollection = async (
   collectionId: string
-): Promise<CollectionWithVocabWords> => {
+): Promise<Readonly<Collection>> => {
   const { data } = await api.get<
-    CollectionWithVocabWords,
-    AxiosResponse<CollectionWithVocabWords>,
+    Readonly<Collection>,
+    AxiosResponse<Readonly<Collection>>,
     null
   >(`/collections/${collectionId}`, await authHeader());
 

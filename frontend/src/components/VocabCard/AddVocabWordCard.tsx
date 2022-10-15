@@ -1,6 +1,7 @@
 import {
   Card as MuiCard,
   CardActionArea as MuiCardActionArea,
+  Grid,
   styled,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
@@ -11,11 +12,13 @@ const AddVocabWordCard: FC<{ collectionId: string }> = ({ collectionId }) => {
   const { createVocabWord } = useCreateVocabWord(collectionId);
 
   return (
-    <Card elevation={0} onClick={() => createVocabWord()}>
-      <CardActionArea>
-        <Add fontSize="large" color="disabled" />
-      </CardActionArea>
-    </Card>
+    <Grid item xs={12} md={6} xl={4}>
+      <Card elevation={0} onClick={() => createVocabWord()}>
+        <CardActionArea>
+          <Add fontSize="large" color="disabled" />
+        </CardActionArea>
+      </Card>
+    </Grid>
   );
 };
 

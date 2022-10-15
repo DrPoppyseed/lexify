@@ -41,6 +41,7 @@ pub struct VocabWord {
     pub updated_at:    NaiveDateTime,
     pub fails:         i32,
     pub successes:     i32,
+    pub priority:      i32,
 }
 
 #[derive(Debug)]

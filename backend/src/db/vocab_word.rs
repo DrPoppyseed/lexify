@@ -20,8 +20,9 @@ impl db::VocabWord {
                     definition: Some(vocab_word.definition.clone()),
                     created_at,
                     updated_at: created_at,
-                    fails: vocab_word.fails.clone(),
-                    successes: vocab_word.successes.clone(),
+                    fails: vocab_word.fails,
+                    successes: vocab_word.successes,
+                    priority: vocab_word.priority,
                 })
                 .execute(conn)
         })
@@ -46,9 +47,9 @@ impl db::VocabWord {
                 db::schema::vocab_words::definition
                     .eq(vocab_word.definition.clone()),
                 db::schema::vocab_words::updated_at.eq(updated_at),
-                db::schema::vocab_words::fails.eq(vocab_word.fails.clone()),
-                db::schema::vocab_words::successes
-                    .eq(vocab_word.successes.clone()),
+                db::schema::vocab_words::fails.eq(vocab_word.fails),
+                db::schema::vocab_words::successes.eq(vocab_word.successes),
+                db::schema::vocab_words::priority.eq(vocab_word.priority),
             ))
             .execute(conn)
         })

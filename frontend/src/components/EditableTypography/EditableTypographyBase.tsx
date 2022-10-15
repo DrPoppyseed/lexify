@@ -23,6 +23,7 @@ export type EditableTypographyBaseProps = {
   enableEnter?: boolean;
   multiline?: boolean;
   rows?: number;
+  fullWidth?: boolean;
 };
 
 // Inspired by https://stackoverflow.com/a/1037385/11435461
@@ -36,6 +37,7 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
   enableEnter = true,
   multiline = false,
   rows = 3,
+  fullWidth = false,
 }) => {
   let currentTimeout = 0;
 
@@ -91,7 +93,7 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
       sx={{ textDecoration }}
       placeholder={placeholder}
       autoFocus
-      fullWidth
+      fullWidth={fullWidth}
       multiline={multiline}
       rows={rows}
     />

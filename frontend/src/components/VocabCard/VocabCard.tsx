@@ -5,15 +5,14 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import produce from "immer";
-import VocabCardFlipperBase from "./VocabCardFlipperBase";
-import VocabCardOneSideBase from "./VocabCardOneSideBase";
-import { Sides } from "../../types/Sides";
+import VocabCardBase from "./VocabCardBase";
 import {
   EditableDefinition,
   EditableWord,
 } from "../EditableTypography/EditableTypography";
 import { useUpdateVocabWord } from "../../hooks/useVocabWord";
 import { VocabWord } from "../../api/types";
+import { Sides } from "../../types/Sides";
 
 const vocabWordSchema = z.object({
   word: z.string().min(1).max(255),
@@ -64,11 +63,12 @@ const VocabCard: FC<{
   };
 
   return (
-    <VocabCardFlipperBase
-      side={side}
+    <VocabCardBase
       id={vocabWord.id}
+      side={side}
+      setSide={setSide}
       front={
-        <VocabCardOneSideBase setSide={setSide}>
+        <>
           <NotKnowsWordButton onClick={(e) => onVocabWordNotKnownClicked(e)}>
             <QuestionMark color="error" />
           </NotKnowsWordButton>
@@ -84,15 +84,13 @@ const VocabCard: FC<{
           <KnowsWordButton onClick={(e) => onVocabWordKnownClicked(e)}>
             <Check color="success" />
           </KnowsWordButton>
-        </VocabCardOneSideBase>
+        </>
       }
       back={
-        <VocabCardOneSideBase setSide={setSide}>
-          <EditableDefinition
-            register={register("definition")}
-            onSubmit={() => handleSubmit(onSubmit)()}
-          />
-        </VocabCardOneSideBase>
+        <EditableDefinition
+          register={register("definition")}
+          onSubmit={() => handleSubmit(onSubmit)()}
+        />
       }
     />
   );
@@ -108,11 +106,9 @@ const WordActionArea = css`
   position: absolute;
   opacity: 0;
   transition: opacity 0.3s;
-  cursor: pointer;
-  height: 100%;
-  display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 
   &:hover {
     opacity: 1;

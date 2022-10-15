@@ -18,4 +18,5 @@ export type VocabWord = {
   definition: string;
   fails: number;
   successes: number;
+  priority: number;
 };

@@ -44,6 +44,7 @@ pub struct VocabWord {
     pub definition:    String,
     pub fails:         i32,
     pub successes:     i32,
+    pub priority:      i32,
 }
 
 #[derive(Debug)]

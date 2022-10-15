@@ -55,6 +55,7 @@ pub async fn get_vocab_words(
                     definition:    vocab_word.definition.unwrap_or_default(),
                     fails:         vocab_word.fails,
                     successes:     vocab_word.successes,
+                    priority:      vocab_word.priority,
                 })
                 .collect()
         })

@@ -2,8 +2,6 @@ import { AppBar, Grid, styled } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import VocabCard from "../components/VocabCard/VocabCard";
-import AddVocabWordCard from "../components/VocabCard/AddVocabWordCard";
 import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
 import { isDrawerOpenState } from "../state/pageState";
@@ -12,16 +10,15 @@ import CollectionEditor from "../components/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useGetCollection, useGetCollections } from "../hooks/useCollection";
 import { useGetVocabWords } from "../hooks/useVocabWord";
+import VocabCardsContainer from "../components/VocabCardsContainer";
 
 const Home = () => {
   const isDrawerOpen = useRecoilValue(isDrawerOpenState);
   const params = useParams();
   const { getItemFromLocalStorage, setItemToLocalStorage } = useLocalStorage();
   const [isShaking, setIsShaking] = useRecoilState(isShakingState);
-  const { data: collectionsData, isSuccess: getCollectionsIsSuccess } =
-    useGetCollections();
-  const { data: collectionData, isSuccess: getCollectionIsSuccess } =
-    useGetCollection(params?.id);
+  const { data: collectionsData } = useGetCollections();
+  const { data: collectionData } = useGetCollection(params?.id);
   const { data: vocabWordsData } = useGetVocabWords(params?.id);
   const navigate = useNavigate();
 
@@ -62,7 +59,7 @@ const Home = () => {
         <div>Loading...</div>
       )}
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={30}>
-        {params?.id && collectionData ? (
+        {collectionData ? (
           <>
             {/*  header */}
             <CollectionEditorWrapper container>
@@ -74,23 +71,7 @@ const Home = () => {
             </CollectionEditorWrapper>
 
             {/*  body */}
-            <Grid container>
-              <Grid item xs={1} />
-              <Grid item xs={10} container spacing={2}>
-                {vocabWordsData?.map((vocabWord) => (
-                  <Grid key={vocabWord.id} item xs={12} md={6} xl={4}>
-                    <VocabCard
-                      vocabWord={vocabWord}
-                      collectionId={collectionData.id}
-                    />
-                  </Grid>
-                ))}
-                <Grid item xs={12} md={6} xl={4}>
-                  <AddVocabWordCard collectionId={collectionData.id} />
-                </Grid>
-              </Grid>
-              <Grid item xs={1} />
-            </Grid>
+            <VocabCardsContainer collectionId={collectionData.id} />
           </>
         ) : (
           <div>Loading...</div>
@@ -157,5 +138,4 @@ const BodyWrapper = styled("div", {
 const CollectionEditorWrapper = styled(Grid)`
   height: fit-content;
 `;
-
 export default Home;

@@ -48,6 +48,7 @@ export const EditableDefinition: FC<EditableTypographyProps> = ({
     textAlign="center"
     rows={3}
     multiline
+    fullWidth
     enableEnter
   />
 );

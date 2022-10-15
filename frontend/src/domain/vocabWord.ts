@@ -1,7 +1,10 @@
 import { nanoid } from "nanoid";
 import type { VocabWord } from "../api/types";
 
-export const vocabWordFactory = (collectionId: string): VocabWord => {
+export const vocabWordFactory = (
+  collectionId: string,
+  prevPriority: number
+): VocabWord => {
   const id = nanoid();
 
   return {
@@ -11,5 +14,6 @@ export const vocabWordFactory = (collectionId: string): VocabWord => {
     definition: "",
     fails: 0,
     successes: 0,
+    priority: prevPriority + 1,
   };
 };

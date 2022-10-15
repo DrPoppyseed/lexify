@@ -29,6 +29,7 @@ diesel::table! {
         updated_at -> Timestamp,
         fails -> Integer,
         successes -> Integer,
+        priority -> Integer,
     }
 }
 

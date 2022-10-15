@@ -38,3 +38,16 @@ export const updateVocabWord = async (
 
   return data;
 };
+
+export const updateVocabWords = async (
+  collectionId: string,
+  vocabWords: ReadonlyArray<VocabWord>
+): Promise<ReadonlyArray<VocabWord>> => {
+  const { data } = await api.put<
+    ReadonlyArray<VocabWord>,
+    AxiosResponse<ReadonlyArray<VocabWord>>,
+    ReadonlyArray<VocabWord>
+  >(`/vocab_words/${collectionId}`, vocabWords, await authHeader());
+
+  return data;
+};

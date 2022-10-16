@@ -11,6 +11,14 @@ Lexify is built with React/Typescript/vite for the frontend and the Rust/Rocket/
 for the backend.
 Firebase is used for authentication.
 
+### Frontend
+
+State management is handled with react-query(async data like vocab words and collections) and react Context(auth, app state).
+
+### Backend
+
+Rocket(Rust) and mysql is used for a fast server.
+
 ## Testing
 
 Currently we only have integration tests for our API. To get started, first

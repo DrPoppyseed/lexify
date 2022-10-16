@@ -24,5 +24,6 @@ CREATE TABLE IF NOT EXISTS vocab_words (
     successes INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    priority INT NOT NULL DEFAULT 0,
     KEY collection_idx (collection_id)
 );

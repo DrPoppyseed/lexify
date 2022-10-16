@@ -35,7 +35,7 @@ pub struct Collection {
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct VocabWord {
     pub id:            String,
     #[serde(rename = "collectionId")]

@@ -1,10 +1,10 @@
 use chrono::Utc;
-use diesel::{Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{sql_query, Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
 
 use crate::{api, db, rocket_launch::DbPool};
 
 impl db::VocabWord {
-    pub async fn insert_vocab_word(
+    pub fn insert_vocab_word(
         pool: &DbPool,
         vocab_word: api::VocabWord,
     ) -> Result<api::VocabWord, db::StorageError> {
@@ -30,7 +30,7 @@ impl db::VocabWord {
         .map_err(db::StorageError::from)
     }
 
-    pub async fn update_vocab_word(
+    pub fn update_vocab_word(
         pool: &DbPool,
         vocab_word: api::VocabWord,
     ) -> Result<api::VocabWord, db::StorageError> {
@@ -57,7 +57,7 @@ impl db::VocabWord {
         .map_err(db::StorageError::from)
     }
 
-    pub async fn get_vocab_words_for_collection(
+    pub fn get_vocab_words_for_collection(
         pool: &DbPool,
         collection_id: &str,
     ) -> Result<Vec<db::VocabWord>, db::StorageError> {
@@ -68,8 +68,63 @@ impl db::VocabWord {
                 .filter(
                     db::schema::vocab_words::collection_id.eq(collection_id),
                 )
+                .order(db::schema::vocab_words::priority.asc())
                 .get_results(conn)
         })
         .map_err(db::StorageError::from)
+    }
+
+    pub fn update_vocab_words_for_collection(
+        pool: &DbPool,
+        vocab_words: Vec<api::VocabWord>,
+    ) -> Result<Vec<api::VocabWord>, db::StorageError> {
+        let mut pool = pool.get()?;
+
+        let created_at = Utc::now().naive_utc();
+        let values =
+            vocab_words.iter().fold(String::new(), |accum, vocab_word| {
+                format!(
+                    "{}(\"{}\", \"{}\", \"{}\", \"{}\", {}, {}, \"{}\", \"{}\", {})",
+                    if accum.is_empty() {
+                        "".to_string()
+                    } else {
+                        format!("{accum},")
+                    },
+                    vocab_word.id,
+                    vocab_word.collection_id,
+                    vocab_word.word,
+                    vocab_word.definition,
+                    vocab_word.fails,
+                    vocab_word.successes,
+                    created_at,
+                    created_at,
+                    vocab_word.priority
+                )
+            });
+
+        let statement = format!(
+            r#"
+            INSERT INTO vocab_words
+                (id, collection_id, word, definition, fails, successes, created_at, updated_at, priority)
+            VALUES
+                {}
+            ON DUPLICATE KEY UPDATE
+                word = VALUES(word),
+                definition = VALUES(definition),
+                fails = VALUES(fails),
+                successes = VALUES(successes),
+                updated_at = VALUES(updated_at),
+                priority = VALUES(priority);"#,
+            values
+        );
+
+        println!("Update statement: {statement}");
+
+        pool.transaction(|conn| sql_query(statement).execute(conn))
+            .map(|_| vocab_words)
+            .map_err(|e| {
+                println!("Failed to update vocab_words with error: {:?}", e);
+                db::StorageError::from(e)
+            })
     }
 }

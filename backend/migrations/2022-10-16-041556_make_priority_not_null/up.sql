@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE vocab_words
+MODIFY COLUMN priority INT NOT NULL DEFAULT 0;
+
+COMMIT;

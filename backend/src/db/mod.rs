@@ -37,10 +37,10 @@ pub struct VocabWord {
     pub collection_id: String,
     pub word:          String,
     pub definition:    Option<String>,
-    pub created_at:    NaiveDateTime,
-    pub updated_at:    NaiveDateTime,
     pub fails:         i32,
     pub successes:     i32,
+    pub created_at:    NaiveDateTime,
+    pub updated_at:    NaiveDateTime,
     pub priority:      i32,
 }
 

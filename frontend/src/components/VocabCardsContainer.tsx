@@ -1,19 +1,20 @@
 import { Grid } from "@mui/material";
 import { FC } from "react";
 import {
+  Active,
   closestCenter,
   DndContext,
+  Over,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { DragEndEvent } from "@dnd-kit/core/dist/types";
 import VocabCard from "./VocabCard/VocabCard";
 import AddVocabWordCard from "./VocabCard/AddVocabWordCard";
 import { useGetVocabWords, useUpdateVocabWords } from "../hooks/useVocabWord";
-import { VocabWord } from "../api/types";
+import { moveVocabWord } from "../utils";
 
 const activationConstraint = {
   delay: 250,
@@ -30,25 +31,19 @@ const VocabCardsContainer: FC<{ collectionId: string }> = ({
     useSensor(TouchSensor, { activationConstraint })
   );
 
-  const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-
+  const handleDragEnd = ({
+    active,
+    over,
+  }: {
+    active: Active;
+    over: Over | null;
+  }) => {
     if (data && active.id !== over?.id) {
-      const vocabWords = [...data];
-      const vocabWord = vocabWords.find(({ id }) => id === active.id);
-
-      if (vocabWord) {
-        const fromIndex = vocabWords.indexOf(vocabWord);
-        const toIndex = vocabWords.findIndex(({ id }) => id === over?.id);
-        vocabWords.splice(fromIndex, 1);
-        vocabWords.splice(toIndex, 0, vocabWord);
-        vocabWords.map<VocabWord>((word, index) => ({
-          ...word,
-          priority: index,
-        }));
-        updateVocabWords(vocabWords);
-      } else {
-        console.log(`vocabWord(id=${active.id}) not found!`);
+      const vocabWord = data.find(({ id }) => id === active.id);
+      if (vocabWord && over?.id) {
+        updateVocabWords(
+          moveVocabWord([...data], vocabWord, over.id.toString())
+        );
       }
     }
   };

@@ -119,9 +119,6 @@ export const useUpdateVocabWords = (collectionId: string) => {
           context?.prevVocabWords
         );
       },
-      onSettled: () => {
-        queryClient.invalidateQueries(["vocabWords", collectionId]);
-      },
     }
   );
 

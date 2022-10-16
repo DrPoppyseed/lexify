@@ -20,7 +20,12 @@ use crate::{
 };
 
 pub fn routes() -> Vec<Route> {
-    routes![get_vocab_words, create_vocab_word, update_vocab_word]
+    routes![
+        get_vocab_words,
+        create_vocab_word,
+        update_vocab_word,
+        update_vocab_words,
+    ]
 }
 
 #[get("/<collection_id>")]
@@ -45,7 +50,7 @@ pub async fn get_vocab_words(
             &state.db_pool,
             collection_id,
         )
-        .map_ok(|vocab_words| {
+        .map(|vocab_words| {
             vocab_words
                 .into_iter()
                 .map(|vocab_word| api::VocabWord {
@@ -59,12 +64,11 @@ pub async fn get_vocab_words(
                 })
                 .collect()
         })
-        .map_ok(|vocab_words| api::ApiResponse {
+        .map(|vocab_words| api::ApiResponse {
             json:   Some(Json(vocab_words)),
             status: Status::Ok,
         })
         .map_err(HttpError::from)
-        .await
     }
 }
 
@@ -81,12 +85,11 @@ pub async fn create_vocab_word(
         .await?;
 
     db::VocabWord::insert_vocab_word(&state.db_pool, vocab_word.0)
-        .map_ok(|vocab_word| api::ApiResponse {
+        .map(|vocab_word| api::ApiResponse {
             json:   Some(Json(vocab_word)),
             status: Status::Created,
         })
         .map_err(HttpError::from)
-        .await
 }
 
 #[put("/", data = "<vocab_word>")]
@@ -102,10 +105,40 @@ pub async fn update_vocab_word(
         .await?;
 
     db::VocabWord::update_vocab_word(&state.db_pool, vocab_word.0)
-        .map_ok(|vocab_word| api::ApiResponse {
+        .map(|vocab_word| api::ApiResponse {
             json:   Some(Json(vocab_word)),
             status: Status::Ok,
         })
         .map_err(HttpError::from)
-        .await
+}
+
+#[put("/<collection_id>", data = "<vocab_words>")]
+pub async fn update_vocab_words(
+    collection_id: &str,
+    vocab_words: Json<Vec<api::VocabWord>>,
+    state: &State<ServerState>,
+    token: BearerToken,
+) -> Result<api::ApiResponse<Vec<api::VocabWord>>, HttpError> {
+    info!("[API][update_vocab_words] function triggered!");
+
+    let uid = api::get_uid_from_token(state, &token)
+        .map_err(|_| HttpError::unauthorized())
+        .await?;
+
+    let collection =
+        db::Collection::get_collection(&state.db_pool, collection_id).await?;
+
+    if uid != collection.user_id {
+        Err(HttpError::unauthorized())
+    } else {
+        db::VocabWord::update_vocab_words_for_collection(
+            &state.db_pool,
+            vocab_words.0,
+        )
+        .map(|vocab_words| api::ApiResponse {
+            json:   Some(Json(vocab_words)),
+            status: Status::Ok,
+        })
+        .map_err(HttpError::from)
+    }
 }

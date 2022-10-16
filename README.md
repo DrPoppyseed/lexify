@@ -3,7 +3,7 @@
 A digital flip cards app. I built it so I can learn vocabulary words the way I
 like to.
 
-**WIP**
+https://user-images.githubusercontent.com/44737273/196032766-3e063656-9578-4db4-9d58-16847cfbb726.mov
 
 ## Technology
 

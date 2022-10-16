@@ -1,10 +1,9 @@
 import { IconButton, styled, Toolbar as MuiToolbar } from "@mui/material";
 import { Menu, MoreVert } from "@mui/icons-material";
-import { useRecoilState } from "recoil";
-import { isDrawerOpenState } from "../state/pageState";
+import { useAppState } from "../hooks/useAppState";
 
 const Header = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
+  const { isDrawerOpen, setIsDrawerOpen } = useAppState();
 
   const handleDrawerClick = () => {
     setIsDrawerOpen((prev) => !prev);

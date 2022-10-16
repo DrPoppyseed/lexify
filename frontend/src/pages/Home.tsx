@@ -1,22 +1,19 @@
 import { AppBar, Grid, styled } from "@mui/material";
-import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { isShakingState } from "../state/vocabCardState";
 import Header from "../components/Header";
-import { isDrawerOpenState } from "../state/pageState";
 import Drawer from "../components/Drawer/Drawer";
 import CollectionEditor from "../components/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useGetCollection, useGetCollections } from "../hooks/useCollection";
 import { useGetVocabWords } from "../hooks/useVocabWord";
 import VocabCardsContainer from "../components/VocabCardsContainer";
+import { useAppState } from "../hooks/useAppState";
 
 const Home = () => {
-  const isDrawerOpen = useRecoilValue(isDrawerOpenState);
+  const { isDrawerOpen } = useAppState();
   const params = useParams();
   const { getItemFromLocalStorage, setItemToLocalStorage } = useLocalStorage();
-  const [isShaking, setIsShaking] = useRecoilState(isShakingState);
   const { data: collectionsData } = useGetCollections();
   const { data: collectionData } = useGetCollection(params?.id);
   const { data: vocabWordsData } = useGetVocabWords(params?.id);
@@ -38,13 +35,7 @@ const Home = () => {
   }, [params]);
 
   return (
-    <CollectionsBase
-      onClick={() => {
-        if (isShaking) {
-          setIsShaking(false);
-        }
-      }}
-    >
+    <CollectionsBase>
       <HeaderWrapper
         position="fixed"
         elevation={0}

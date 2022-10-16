@@ -1,7 +1,9 @@
 import React, {
   createContext,
+  Dispatch,
   FC,
   ReactNode,
+  SetStateAction,
   useEffect,
   useMemo,
   useState,
@@ -12,9 +14,9 @@ import { firebaseApp } from "../config/firebase";
 
 type AuthContextType = {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: Dispatch<SetStateAction<AuthContextType["user"]>>;
   authLoading: boolean;
-  setAuthLoading: (loading: boolean) => void;
+  setAuthLoading: Dispatch<SetStateAction<AuthContextType["authLoading"]>>;
 };
 
 const authContextDefaultValue: AuthContextType = {
@@ -27,8 +29,12 @@ const authContextDefaultValue: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(authContextDefaultValue);
 
 const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [authLoading, setAuthLoading] = useState(true);
-  const [user, setUser] = useState<AuthContextType["user"]>(null);
+  const [authLoading, setAuthLoading] = useState(
+    authContextDefaultValue.authLoading
+  );
+  const [user, setUser] = useState<AuthContextType["user"]>(
+    authContextDefaultValue.user
+  );
 
   useEffect(() => {
     onAuthStateChanged(getAuth(firebaseApp), (authnedUser) => {
@@ -56,5 +62,4 @@ const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-export const AuthConsumer = AuthContext.Consumer;
 export { AuthContext, AuthProvider };

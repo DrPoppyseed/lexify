@@ -9,17 +9,16 @@ import {
   SwipeableDrawer,
 } from "@mui/material";
 import { Add, Menu } from "@mui/icons-material";
-import { useRecoilState } from "recoil";
-import { isDrawerOpenState } from "../../state/pageState";
 import DrawerItem from "./DrawerItem";
 import { useCreateCollection } from "../../hooks/useCollection";
 import { Collection } from "../../api/types";
+import { useAppState } from "../../hooks/useAppState";
 
 const Drawer: FC<{
   collections: ReadonlyArray<Collection>;
   width?: number;
 }> = ({ collections, width = 30 }) => {
-  const [isDrawerOpen, setIsDrawerOpen] = useRecoilState(isDrawerOpenState);
+  const { isDrawerOpen, setIsDrawerOpen } = useAppState();
   const { createCollection } = useCreateCollection();
 
   const onClickCreateCollection = async () => {

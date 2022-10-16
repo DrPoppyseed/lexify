@@ -1,12 +1,11 @@
 import { AppBar, Grid, styled } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Header from "../components/Header";
 import Drawer from "../components/Drawer/Drawer";
 import CollectionEditor from "../components/CollectionEditor";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { useGetCollection, useGetCollections } from "../hooks/useCollection";
-import { useGetVocabWords } from "../hooks/useVocabWord";
+import { useGetCollections } from "../hooks/useCollection";
 import VocabCardsContainer from "../components/VocabCardsContainer";
 import { useAppState } from "../hooks/useAppState";
 
@@ -14,9 +13,7 @@ const Home = () => {
   const { isDrawerOpen } = useAppState();
   const params = useParams();
   const { getItemFromLocalStorage, setItemToLocalStorage } = useLocalStorage();
-  const { data: collectionsData } = useGetCollections();
-  const { data: collectionData } = useGetCollection(params?.id);
-  const { data: vocabWordsData } = useGetVocabWords(params?.id);
+  const { data } = useGetCollections();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +31,12 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
+  const collectionData = useMemo(
+    () =>
+      data && params?.id ? data.find((col) => col.id === params.id) : null,
+    [data, params]
+  );
+
   return (
     <CollectionsBase>
       <HeaderWrapper
@@ -44,25 +47,21 @@ const Home = () => {
       >
         <Header />
       </HeaderWrapper>
-      {collectionsData ? (
-        <Drawer collections={collectionsData} />
-      ) : (
-        <div>Loading...</div>
-      )}
+      {data ? <Drawer collections={data} /> : <div>Loading...</div>}
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={30}>
-        {collectionData ? (
+        {collectionData && params?.id ? (
           <>
             {/*  header */}
             <CollectionEditorWrapper container>
               <Grid item xs={1} />
               <Grid item xs={10}>
-                <CollectionEditor {...collectionData} id={collectionData.id} />
+                <CollectionEditor {...collectionData} id={params.id} />
               </Grid>
               <Grid item xs={1} />
             </CollectionEditorWrapper>
 
             {/*  body */}
-            <VocabCardsContainer collectionId={collectionData.id} />
+            <VocabCardsContainer collectionId={params.id} />
           </>
         ) : (
           <div>Loading...</div>

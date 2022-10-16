@@ -19,6 +19,7 @@ export const EditableTitle: FC<EditableTypographyProps> = ({
     placeholder={placeholder}
     fontSize={24}
     enableEnter={false}
+    fullWidth
   />
 );
 

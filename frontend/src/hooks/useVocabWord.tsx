@@ -136,7 +136,6 @@ export const useGetVocabWords = (collectionId: Option<string>) => {
     () => getVocabWords(collectionId as string),
     {
       enabled: !!collectionId,
-      refetchOnWindowFocus: false,
       placeholderData: () =>
         queryClient.getQueryData<ReadonlyArray<VocabWord>>([
           "vocabWords",

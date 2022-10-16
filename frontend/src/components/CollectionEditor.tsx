@@ -38,13 +38,13 @@ const CollectionEditor: FC<{
     });
   }, [reset, name, description]);
 
-  const onSubmit: SubmitHandler<CollectionEditorForm> = async (formData) => {
+  const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
     const updatedCollection: Collection = {
       id,
       userId,
       ...formData,
     };
-    await updateCollection(updatedCollection);
+    updateCollection(updatedCollection);
   };
 
   return (
@@ -56,6 +56,7 @@ const CollectionEditor: FC<{
       <EditableTypographyBase
         onSubmit={() => handleSubmit(onSubmit)()}
         register={register("description")}
+        fullWidth
       />
     </CollectionEditorBase>
   );

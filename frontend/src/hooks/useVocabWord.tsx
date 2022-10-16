@@ -11,7 +11,7 @@ import { Option } from "../types/utils";
 
 export const useCreateVocabWord = (collectionId: string) => {
   const queryClient = useQueryClient();
-  const { mutate, isLoading, isError, isSuccess } = useMutation(
+  const { mutate, ...props } = useMutation(
     (vocabWord: VocabWord) => createVocabWordInAPI(collectionId, vocabWord),
     {
       onMutate: async (vocabWord: VocabWord) => {
@@ -51,13 +51,13 @@ export const useCreateVocabWord = (collectionId: string) => {
     });
   };
 
-  return { createVocabWord, isLoading, isError, isSuccess };
+  return { createVocabWord, ...props };
 };
 
 // idempotent update on a single vocabWord
 export const useUpdateVocabWord = (collectionId: string) => {
   const queryClient = useQueryClient();
-  const { mutate, isLoading, isError, isSuccess } = useMutation(
+  const { mutate, ...props } = useMutation(
     (vocabWord: VocabWord) => updateVocabWordInAPI(vocabWord),
     {
       onMutate: async (vocabWord: VocabWord) => {
@@ -91,13 +91,13 @@ export const useUpdateVocabWord = (collectionId: string) => {
       collectionId,
     });
 
-  return { updateVocabWord, isLoading, isError, isSuccess };
+  return { updateVocabWord, ...props };
 };
 
 // idempotent update on vocabWords array
 export const useUpdateVocabWords = (collectionId: string) => {
   const queryClient = useQueryClient();
-  const { mutate, isLoading, isError, isSuccess } = useMutation(
+  const { mutate, ...props } = useMutation(
     (vocabWords: ReadonlyArray<VocabWord>) =>
       updateVocabWordsInAPI(collectionId, vocabWords),
     {
@@ -126,17 +126,24 @@ export const useUpdateVocabWords = (collectionId: string) => {
     mutate(vocabWords);
   };
 
-  return { updateVocabWords, isLoading, isError, isSuccess };
+  return { updateVocabWords, ...props };
 };
 
 export const useGetVocabWords = (collectionId: Option<string>) => {
-  const { data, isLoading, isError, isSuccess } = useQuery(
+  const queryClient = useQueryClient();
+  const { data, ...props } = useQuery(
     ["vocabWords", collectionId],
     () => getVocabWords(collectionId as string),
     {
       enabled: !!collectionId,
+      refetchOnWindowFocus: false,
+      placeholderData: () =>
+        queryClient.getQueryData<ReadonlyArray<VocabWord>>([
+          "vocabWords",
+          collectionId,
+        ]),
     }
   );
 
-  return { data, isLoading, isError, isSuccess };
+  return { data, ...props };
 };

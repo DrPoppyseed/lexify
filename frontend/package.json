@@ -47,6 +47,7 @@
     "@mui/material": "^5.10.9",
     "@rollup/plugin-image": "^2.1.1",
     "@tanstack/react-query": "^4.12.0",
+    "@tanstack/react-query-devtools": "^4.12.0",
     "axios": "^0.27.2",
     "firebase": "^9.12.1",
     "immer": "^9.0.15",

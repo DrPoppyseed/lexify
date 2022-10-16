@@ -1,5 +1,5 @@
-import { FC, MouseEvent, ReactNode } from "react";
-import { Card, css, Grid, styled } from "@mui/material";
+import { Dispatch, FC, MouseEvent, ReactNode, SetStateAction } from "react";
+import { css, Grid, styled } from "@mui/material";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Sides } from "../../types/Sides";
@@ -10,11 +10,13 @@ const VocabCardBase: FC<{
   front: ReactNode;
   back: ReactNode;
   id: string;
-  setSide: (side: Sides | ((prev: Sides) => Sides)) => void;
+  setSide: Dispatch<SetStateAction<Sides>>;
   side: Sides;
 }> = ({ setSide, side, front, back, id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+    useSortable({
+      id,
+    });
   const alpha = 0.3;
   const direction = "hor";
 
@@ -41,16 +43,14 @@ const VocabCardBase: FC<{
       {...attributes}
       {...listeners}
     >
-      <FlipCardContainer zIndex="auto">
-        <Flipper>
-          <Front alpha={alpha} side={side} direction={direction}>
-            <CardBase>{front}</CardBase>
-          </Front>
-          <Back alpha={alpha} side={side} direction={direction}>
-            <CardBase>{back}</CardBase>
-          </Back>
-        </Flipper>
-      </FlipCardContainer>
+      <Flipper>
+        <Front alpha={alpha} side={side} direction={direction}>
+          {front}
+        </Front>
+        <Back alpha={alpha} side={side} direction={direction}>
+          {back}
+        </Back>
+      </Flipper>
     </CardContainer>
   );
 };
@@ -58,18 +58,6 @@ const VocabCardBase: FC<{
 const CardContainer = styled(Grid)`
   position: relative;
   transform-origin: 50% 100%;
-
-  &:active {
-    cursor: grabbing;
-  }
-`;
-
-const FlipCardContainer = styled("div", {
-  shouldForwardProp: (props) => props !== "zIndex",
-})<{ zIndex: string }>`
-  perspective: 1000px;
-  z-index: ${(props) => props.zIndex};
-  height: 100%;
 `;
 
 const Flipper = styled("div")`
@@ -85,6 +73,19 @@ const SideBase = css`
   top: 0;
   transform-style: preserve-3d;
   backface-visibility: hidden;
+
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+  background-color: #fffcf7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  cursor: pointer;
+  &:active {
+    cursor: grabbing;
+  }
 `;
 
 const Front = styled("div")<{
@@ -100,6 +101,8 @@ const Front = styled("div")<{
       ? `rotateY(${props.side === "front" ? 0 : 180}deg)`
       : `rotateX(${props.side === "front" ? 0 : 180}deg)`};
   transition: ${(props) => props.alpha}s;
+  height: ${({ theme }) => theme.spacing(16)};
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const Back = styled("div")<{
@@ -114,17 +117,8 @@ const Back = styled("div")<{
       ? `rotateY(${props.side === "front" ? -180 : 0}deg)`
       : `rotateX(${props.side === "front" ? -180 : 0}deg)`};
   transition: ${(props) => props.alpha}s;
-`;
-
-const CardBase = styled(Card)`
-  background-color: #fffcf7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
   height: ${({ theme }) => theme.spacing(16)};
   padding: ${({ theme }) => theme.spacing(2)};
-  cursor: pointer;
 `;
 
 export default VocabCardBase;

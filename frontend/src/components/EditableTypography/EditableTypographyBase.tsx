@@ -47,8 +47,8 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
     }
   };
 
-  const shouldIgnore = (event: KeyboardEvent<HTMLDivElement>) => {
-    const keysToIgnore = [
+  const shouldIgnore = (event: KeyboardEvent<HTMLDivElement>) =>
+    [
       "Tab",
       "ArrowUp",
       "ArrowDown",
@@ -58,9 +58,7 @@ const EditableTypographyBase: FC<EditableTypographyBaseProps> = ({
       "Alt",
       "Control",
       "Escape",
-    ];
-    return keysToIgnore.includes(event.key);
-  };
+    ].includes(event.key);
 
   return (
     <TextField

@@ -1,10 +1,7 @@
 import { FC, MouseEvent, useState } from "react";
 import { ButtonBase, css, styled, Typography } from "@mui/material";
 import { Check, QuestionMark } from "@mui/icons-material";
-import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import produce from "immer";
 import VocabCardBase from "./VocabCardBase";
 import {
   EditableDefinition,
@@ -13,11 +10,6 @@ import {
 import { useUpdateVocabWord } from "../../hooks/useVocabWord";
 import { VocabWord } from "../../api/types";
 import { Sides } from "../../types/Sides";
-
-const vocabWordSchema = z.object({
-  word: z.string().min(1).max(255),
-  definition: z.string().max(255),
-});
 
 const VocabCard: FC<{
   vocabWord: VocabWord;
@@ -30,18 +22,17 @@ const VocabCard: FC<{
   const { updateVocabWord } = useUpdateVocabWord(collectionId);
 
   const { register, handleSubmit } = useForm<VocabWord>({
-    resolver: zodResolver(vocabWordSchema),
     defaultValues: {
       ...vocabWord,
     },
   });
 
-  const onSubmit: SubmitHandler<VocabWord> = async (formData) => {
-    const updatedVocabWord = produce(vocabWord, (draft) => {
-      draft.word = formData.word;
-      draft.definition = formData.definition;
+  const onSubmit: SubmitHandler<VocabWord> = (formData) => {
+    updateVocabWord({
+      ...vocabWord,
+      word: formData.word,
+      definition: formData.definition,
     });
-    await updateVocabWord(updatedVocabWord);
   };
 
   const onVocabWordNotKnownClicked = (e?: MouseEvent<HTMLButtonElement>) => {
@@ -74,7 +65,7 @@ const VocabCard: FC<{
           </NotKnowsWordButton>
           <EditableWord
             onSubmit={() => handleSubmit(onSubmit)()}
-            register={register("word")}
+            register={register("word", { maxLength: 255 })}
           />
           <Tally>
             <Typography variant="caption">{tally.fails}</Typography>
@@ -88,7 +79,7 @@ const VocabCard: FC<{
       }
       back={
         <EditableDefinition
-          register={register("definition")}
+          register={register("definition", { maxLength: 255 })}
           onSubmit={() => handleSubmit(onSubmit)()}
         />
       }

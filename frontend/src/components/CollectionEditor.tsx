@@ -1,20 +1,10 @@
 import { styled } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect } from "react";
 import { EditableTitle } from "./EditableTypography/EditableTypography";
 import EditableTypographyBase from "./EditableTypography/EditableTypographyBase";
 import { useUpdateCollection } from "../hooks/useCollection";
-import { Collection } from "../api/types";
 import { Option } from "../types/utils";
-
-const collectionEditorSchema = z.object({
-  name: z.string().max(50),
-  description: z.string(),
-});
-
-export type CollectionEditorForm = z.infer<typeof collectionEditorSchema>;
 
 const CollectionEditor: FC<{
   id: string;
@@ -23,8 +13,10 @@ const CollectionEditor: FC<{
   description: Option<string>;
 }> = ({ id, userId, name, description }) => {
   const { updateCollection } = useUpdateCollection();
-  const { reset, register, handleSubmit } = useForm<CollectionEditorForm>({
-    resolver: zodResolver(collectionEditorSchema),
+  const { reset, register, handleSubmit } = useForm<{
+    name: string;
+    description: string;
+  }>({
     defaultValues: {
       name,
       description,
@@ -38,14 +30,14 @@ const CollectionEditor: FC<{
     });
   }, [reset, name, description]);
 
-  const onSubmit: SubmitHandler<CollectionEditorForm> = (formData) => {
-    const updatedCollection: Collection = {
+  const onSubmit: SubmitHandler<{ name: string; description: string }> = (
+    formData
+  ) =>
+    updateCollection({
+      ...formData,
       id,
       userId,
-      ...formData,
-    };
-    updateCollection(updatedCollection);
-  };
+    });
 
   return (
     <CollectionEditorBase>

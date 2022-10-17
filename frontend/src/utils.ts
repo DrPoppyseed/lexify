@@ -1,3 +1,4 @@
+import { getAuth } from "firebase/auth";
 import { VocabWord } from "./api/types";
 
 // TODO: come up with a functional way of handling this
@@ -15,4 +16,14 @@ export const moveVocabWord = (
     ...word,
     priority: index + 1,
   }));
+};
+
+export const authHeader = async () => {
+  const token = await getAuth()?.currentUser?.getIdToken();
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 };

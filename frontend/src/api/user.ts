@@ -1,8 +1,8 @@
-import { UserCredential } from "firebase/auth";
-import { AxiosResponse } from "axios";
+import type { UserCredential } from "firebase/auth";
+import type { AxiosResponse } from "axios";
 import { api } from "../config/axios";
-import { User } from "./types";
-import { authHeader } from "./utils";
+import type { User } from "./types";
+import { authHeader } from "../utils";
 
 export const getOrCreateUser = async (
   authnedUser: UserCredential

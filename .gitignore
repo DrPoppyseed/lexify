@@ -19,3 +19,4 @@ backend/target
 backend/Rocket.toml
 
 frontend/.firebase
+frontend/stats.html

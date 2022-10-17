@@ -13,7 +13,7 @@ const VocabCardBase: FC<{
   setSide: Dispatch<SetStateAction<Sides>>;
   side: Sides;
 }> = ({ setSide, side, front, back, id }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { attributes, listeners, setNodeRef, transform, transition, isOver } =
     useSortable({
       id,
     });
@@ -58,12 +58,13 @@ const VocabCardBase: FC<{
 const CardContainer = styled(Grid)`
   position: relative;
   transform-origin: 50% 100%;
-`;
 
-const Flipper = styled("div")`
-  height: 100%;
-  position: relative;
-  width: 100%;
+  z-index: auto;
+  cursor: pointer;
+
+  &:active {
+    z-index: 999;
+  }
 `;
 
 const SideBase = css`
@@ -82,10 +83,19 @@ const SideBase = css`
   justify-content: center;
   position: relative;
 
-  cursor: pointer;
+  transition: box-shadow 0.5s ease-in-out;
   &:active {
+    touch-action: manipulation;
     cursor: grabbing;
+    scale: 1.05;
+    box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
   }
+`;
+
+const Flipper = styled("div")`
+  height: 100%;
+  position: relative;
+  width: 100%;
 `;
 
 const Front = styled("div")<{
@@ -111,6 +121,7 @@ const Back = styled("div")<{
   alpha: number;
 }>`
   ${SideBase};
+  z-index: 1;
   position: ${(props) => (props.side === "front" ? "absolute" : "relative")};
   transform: ${(props) =>
     props.direction === "hor"

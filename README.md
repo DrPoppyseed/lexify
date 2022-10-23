@@ -1,9 +1,11 @@
 # Lexify
 
+🛠 __Under active development__
+
 A digital flip cards app. I built it so I can learn vocabulary words the way I
 like to.
 
-https://user-images.githubusercontent.com/44737273/196032766-3e063656-9578-4db4-9d58-16847cfbb726.mov
+https://user-images.githubusercontent.com/44737273/197379378-38541907-32d8-4d47-ac91-ec57ce111084.mov
 
 ## Technology
 

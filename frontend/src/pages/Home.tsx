@@ -47,9 +47,9 @@ const Home = () => {
       >
         <Header />
       </HeaderWrapper>
-      {data ? <Drawer collections={data} /> : <div>Loading...</div>}
+      <Drawer collections={data} />
       <BodyWrapper isDrawerOpen={isDrawerOpen} drawerWidth={30}>
-        {collectionData && params?.id ? (
+        {collectionData && params?.id && (
           <>
             {/*  header */}
             <CollectionEditorWrapper container>
@@ -63,8 +63,6 @@ const Home = () => {
             {/*  body */}
             <VocabCardsContainer collectionId={params.id} />
           </>
-        ) : (
-          <div>Loading...</div>
         )}
       </BodyWrapper>
     </CollectionsBase>
@@ -80,7 +78,7 @@ const HeaderWrapper = styled(AppBar, {
   shouldForwardProp: (props) =>
     props !== "isDrawerOpen" && props !== "drawerWidth",
 })<{ isDrawerOpen: boolean; drawerWidth: number }>`
-  background-color: #fffcf7;
+  background-color: transparent;
   transition: ${({ theme }) =>
     theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.sharp,

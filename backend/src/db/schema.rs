@@ -8,6 +8,7 @@ diesel::table! {
         description -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        priority -> Integer,
     }
 }
 
@@ -33,8 +34,4 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(
-    collections,
-    users,
-    vocab_words,
-);
+diesel::allow_tables_to_appear_in_same_query!(collections, users, vocab_words,);

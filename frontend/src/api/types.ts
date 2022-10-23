@@ -5,6 +5,7 @@ export type Collection = {
   userId: string;
   name: string;
   description: Option<string>;
+  priority: number;
 };
 
 export type User = {

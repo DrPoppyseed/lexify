@@ -26,13 +26,14 @@ pub struct User {
     pub id: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Collection {
     pub id:          String,
     #[serde(rename = "userId")]
     pub user_id:     String,
     pub name:        String,
     pub description: Option<String>,
+    pub priority:    i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]

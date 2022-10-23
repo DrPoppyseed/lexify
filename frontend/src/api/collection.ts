@@ -15,7 +15,7 @@ export const createCollection = async (collection: Collection): Promise<null> =>
 export const updateCollection = async (collection: Collection): Promise<null> =>
   api
     .put<null, AxiosResponse<null>, Collection>(
-      "/collections",
+      `/collections/${collection.id}`,
       collection,
       await authHeader()
     )
@@ -28,4 +28,15 @@ export const getCollections = async (): Promise<ReadonlyArray<Collection>> =>
       AxiosResponse<ReadonlyArray<Collection>>,
       null
     >("/collections", await authHeader())
+    .then((res) => res.data);
+
+export const updateCollections = async (
+  collections: ReadonlyArray<Collection>
+): Promise<ReadonlyArray<Collection>> =>
+  api
+    .put<
+      ReadonlyArray<Collection>,
+      AxiosResponse<ReadonlyArray<Collection>>,
+      ReadonlyArray<Collection>
+    >("/collections", collections, await authHeader())
     .then((res) => res.data);

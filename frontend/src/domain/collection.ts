@@ -1,7 +1,10 @@
 import { nanoid } from "nanoid";
 import { Collection } from "../api/types";
 
-export const collectionFactory = (userId: string): Collection => {
+export const collectionFactory = (
+  userId: string,
+  prevPriority: number
+): Collection => {
   const id = nanoid();
 
   return {
@@ -9,5 +12,6 @@ export const collectionFactory = (userId: string): Collection => {
     userId,
     name: "Untitled",
     description: undefined,
+    priority: prevPriority + 1,
   };
 };

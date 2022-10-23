@@ -206,7 +206,7 @@ async fn update_vocab_words_happy_path() {
     assert_eq!(vocab_words_in_db.len(), 2);
 
     let updated_vocab_word = vocab_words_in_db
-        .into_iter()
+        .iter()
         .find(|vocab_word| vocab_word.id == VW_ID);
 
     // Check if vocab words with the same key get updated in place in the DB

@@ -4,14 +4,15 @@ import { FC, useEffect } from "react";
 import { EditableTitle } from "./EditableTypography/EditableTypography";
 import EditableTypographyBase from "./EditableTypography/EditableTypographyBase";
 import { useUpdateCollection } from "../hooks/useCollection";
-import { Option } from "../types/utils";
+import type { Collection } from "../api/types";
 
-const CollectionEditor: FC<{
-  id: string;
-  userId: string;
-  name: string;
-  description: Option<string>;
-}> = ({ id, userId, name, description }) => {
+const CollectionEditor: FC<Collection> = ({
+  id,
+  userId,
+  name,
+  description,
+  priority,
+}) => {
   const { updateCollection } = useUpdateCollection();
   const { reset, register, handleSubmit } = useForm<{
     name: string;
@@ -37,6 +38,7 @@ const CollectionEditor: FC<{
       ...formData,
       id,
       userId,
+      priority,
     });
 
   return (

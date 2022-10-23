@@ -24,7 +24,8 @@ pub fn routes() -> Vec<Route> {
         get_collection,
         get_collections,
         create_collection,
-        update_collection
+        update_collection,
+        update_collections
     ]
 }
 
@@ -40,7 +41,7 @@ pub async fn get_collections(
         .await?;
 
     db::Collection::get_collections(&state.db_pool, uid)
-        .map_ok(|db_collections| {
+        .map(|db_collections| {
             info!("[API][get_collections] collections fetched from database!");
             db_collections
                 .into_iter()
@@ -49,10 +50,11 @@ pub async fn get_collections(
                     user_id:     collection.user_id,
                     name:        collection.name,
                     description: collection.description,
+                    priority:    collection.priority,
                 })
                 .collect()
         })
-        .map_ok(|api_collections| api::ApiResponse {
+        .map(|api_collections| api::ApiResponse {
             json:   Some(Json(api_collections)),
             status: Status::Ok,
         })
@@ -60,7 +62,6 @@ pub async fn get_collections(
             error!("[API][get_collections] {:#?}", e);
             HttpError::from(e)
         })
-        .await
 }
 
 #[post("/", data = "<collection>")]
@@ -80,18 +81,18 @@ pub async fn create_collection(
     } else {
         info!("[API][create_collection] user={uid} inserting collection.");
         db::Collection::insert_collection(&state.db_pool, collection.0)
-            .map_ok(|_| Status::Created)
+            .map(|_| Status::Created)
             .map_err(|e| {
                 error!("[API][create_collection] {:#?}", e);
                 HttpError::from(e)
             })
-            .await
     }
 }
 
-#[put("/", data = "<collection>")]
+#[put("/<collection_id>", data = "<collection>")]
 pub async fn update_collection(
     collection: Json<api::Collection>,
+    collection_id: &str,
     state: &State<ServerState>,
     token: BearerToken,
 ) -> Result<api::ApiResponse<api::Collection>, HttpError> {
@@ -104,9 +105,10 @@ pub async fn update_collection(
         .and_then(|uid| async move {
             db::Collection::update_collection(&state.db_pool, collection.0)
                 .map_err(HttpError::from)
-                .await
                 .and_then(|collection| {
-                    if uid == collection.user_id {
+                    if uid == collection.user_id
+                        && collection_id == collection.id
+                    {
                         Ok(collection)
                     } else {
                         Err(HttpError::forbidden())
@@ -132,7 +134,6 @@ pub async fn get_collection(
         .and_then(|uid| async move {
             db::Collection::get_collection(&state.db_pool, collection_id)
                 .map_err(HttpError::from)
-                .await
                 .and_then(|collection| {
                     if uid == collection.user_id {
                         Ok(collection)
@@ -147,6 +148,7 @@ pub async fn get_collection(
                 user_id:     collection.user_id,
                 name:        collection.name,
                 description: collection.description,
+                priority:    collection.priority,
             };
             api::ApiResponse {
                 json:   Some(Json(collection)),
@@ -154,4 +156,37 @@ pub async fn get_collection(
             }
         })
         .await
+}
+
+#[put("/", data = "<collections>")]
+pub async fn update_collections(
+    state: &State<ServerState>,
+    token: BearerToken,
+    collections: Json<Vec<api::Collection>>,
+) -> Result<api::ApiResponse<Vec<api::Collection>>, HttpError> {
+    info!("[API][update_collections] function triggered!");
+    api::get_uid_from_token(state, &token)
+        .map_err(|_| HttpError::unauthorized())
+        .and_then(|uid| async move {
+            if collections
+                .iter()
+                .all(|collection| collection.user_id == uid)
+            {
+                Ok(collections)
+            } else {
+                Err(HttpError::forbidden())
+            }
+        })
+        .map_ok(|collections| {
+            db::Collection::update_collections(
+                &state.db_pool,
+                collections.0.as_slice(),
+            )
+            .map(|collections| api::ApiResponse {
+                json:   Some(Json(collections)),
+                status: Status::Ok,
+            })
+            .map_err(HttpError::from)
+        })
+        .await?
 }

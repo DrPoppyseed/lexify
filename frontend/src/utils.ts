@@ -1,18 +1,17 @@
 import { getAuth } from "firebase/auth";
-import { VocabWord } from "./api/types";
 
 // TODO: come up with a functional way of handling this
-export const moveVocabWord = (
-  vocabWords: Array<VocabWord>,
-  vocabWord: VocabWord,
+export const moveInPlace = <T extends { id: string; priority: number }>(
+  items: Array<T>,
+  item: T,
   activeId: string,
   overId: string
 ) => {
-  const fromIndex = vocabWords.findIndex(({ id }) => id === activeId);
-  const toIndex = vocabWords.findIndex(({ id }) => id === overId);
-  vocabWords.splice(fromIndex, 1);
-  vocabWords.splice(toIndex, 0, vocabWord);
-  return vocabWords.map((word, index) => ({
+  const fromIndex = items.findIndex(({ id }) => id === activeId);
+  const toIndex = items.findIndex(({ id }) => id === overId);
+  items.splice(fromIndex, 1);
+  items.splice(toIndex, 0, item);
+  return items.map((word, index) => ({
     ...word,
     priority: index + 1,
   }));

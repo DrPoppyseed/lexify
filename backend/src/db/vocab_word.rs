@@ -118,13 +118,8 @@ impl db::VocabWord {
             values
         );
 
-        println!("Update statement: {statement}");
-
         pool.transaction(|conn| sql_query(statement).execute(conn))
             .map(|_| vocab_words)
-            .map_err(|e| {
-                println!("Failed to update vocab_words with error: {:?}", e);
-                db::StorageError::from(e)
-            })
+            .map_err(db::StorageError::from)
     }
 }

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS collections (
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    priority INT NOT NULL DEFAULT 0,
     KEY user_idx (user_id)
 );
 

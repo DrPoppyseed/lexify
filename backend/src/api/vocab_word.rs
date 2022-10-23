@@ -41,7 +41,7 @@ pub async fn get_vocab_words(
         .await?;
 
     let collection =
-        db::Collection::get_collection(&state.db_pool, collection_id).await?;
+        db::Collection::get_collection(&state.db_pool, collection_id)?;
 
     if uid != collection.user_id {
         Err(HttpError::unauthorized())
@@ -126,7 +126,7 @@ pub async fn update_vocab_words(
         .await?;
 
     let collection =
-        db::Collection::get_collection(&state.db_pool, collection_id).await?;
+        db::Collection::get_collection(&state.db_pool, collection_id)?;
 
     if uid != collection.user_id {
         Err(HttpError::unauthorized())

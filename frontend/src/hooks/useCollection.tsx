@@ -6,6 +6,7 @@ import {
   createCollection as createCollectionInAPI,
   getCollections as getCollectionsInAPI,
   updateCollection as updateCollectionInAPI,
+  updateCollections as updateCollectionsInAPI,
 } from "../api/collection";
 import { collectionFactory } from "../domain/collection";
 
@@ -42,7 +43,11 @@ export const useCreateCollection = () => {
 
   const createCollection = () => {
     if (!user?.uid) throw Error("Unauthorized");
-    const collection = collectionFactory(user.uid);
+    const cachedCollections =
+      queryClient.getQueryData<ReadonlyArray<Collection>>(["collections"]) ||
+      [];
+
+    const collection = collectionFactory(user.uid, cachedCollections?.length);
     mutate(collection);
     navigate(`/${collection.id}`);
   };
@@ -89,6 +94,40 @@ export const useUpdateCollection = () => {
   };
 
   return { updateCollection, ...props };
+};
+
+export const useUpdateCollections = () => {
+  const queryClient = useQueryClient();
+  const { mutate, ...props } = useMutation(
+    (collections: ReadonlyArray<Collection>) =>
+      updateCollectionsInAPI(collections),
+    {
+      onMutate: async (collections: ReadonlyArray<Collection>) => {
+        await queryClient.cancelQueries(["collections"]);
+        const prevCollections = queryClient.getQueryData<
+          ReadonlyArray<Collection>
+        >(["collections"]);
+        queryClient.setQueryData<ReadonlyArray<Collection>>(
+          ["collections"],
+          collections
+        );
+
+        return { prevCollections };
+      },
+      onError: (err, collections, context) => {
+        queryClient.setQueryData<ReadonlyArray<Collection>>(
+          ["collections"],
+          context?.prevCollections
+        );
+      },
+    }
+  );
+
+  const updateCollections = (collections: ReadonlyArray<Collection>) => {
+    mutate(collections);
+  };
+
+  return { updateCollections, ...props };
 };
 
 export const useGetCollections = () =>

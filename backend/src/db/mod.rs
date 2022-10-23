@@ -26,6 +26,7 @@ pub struct Collection {
     pub description: Option<String>,
     pub created_at:  NaiveDateTime,
     pub updated_at:  NaiveDateTime,
+    pub priority:    i32,
 }
 
 #[derive(

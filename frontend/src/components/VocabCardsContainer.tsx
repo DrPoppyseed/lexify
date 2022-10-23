@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Grid, styled, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import {
   Active,
@@ -13,7 +13,7 @@ import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import VocabCard from "./VocabCard/VocabCard";
 import AddVocabWordCard from "./VocabCard/AddVocabWordCard";
 import { useGetVocabWords, useUpdateVocabWords } from "../hooks/useVocabWord";
-import { moveVocabWord } from "../utils";
+import { moveInPlace } from "../utils";
 import { VocabWord } from "../api/types";
 
 const activationConstraint = {
@@ -55,7 +55,7 @@ const VocabCardsContainer: FC<{ collectionId: string }> = ({
     if (data && active.id !== over?.id) {
       const vocabWord = data.find(({ id }) => id === active.id);
       if (vocabWord && over?.id) {
-        const updatedVocabWords = moveVocabWord(
+        const updatedVocabWords = moveInPlace(
           [...data],
           vocabWord,
           active.id.toString(),
@@ -68,7 +68,7 @@ const VocabCardsContainer: FC<{ collectionId: string }> = ({
   };
 
   return (
-    <Grid container>
+    <VocabCardsContainerBase container>
       <Grid item xs={1} />
       <Grid item xs={10} container spacing={2}>
         {cards ? (
@@ -92,12 +92,22 @@ const VocabCardsContainer: FC<{ collectionId: string }> = ({
             <AddVocabWordCard collectionId={collectionId} />
           </DndContext>
         ) : (
-          <div>Loading words...</div>
+          <LoadingText>
+            <Typography>Loading words...</Typography>
+          </LoadingText>
         )}
       </Grid>
       <Grid item xs={1} />
-    </Grid>
+    </VocabCardsContainerBase>
   );
 };
+
+const VocabCardsContainerBase = styled(Grid)`
+  padding-bottom: ${({ theme }) => theme.spacing(8)};
+`;
+
+const LoadingText = styled("div")`
+  padding: ${({ theme }) => theme.spacing(2)};
+`;
 
 export default VocabCardsContainer;

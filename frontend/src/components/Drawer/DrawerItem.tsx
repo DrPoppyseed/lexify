@@ -1,23 +1,18 @@
-import { FC } from "react";
-import { useNavigate } from "react-router-dom";
-import { ListItemText, MenuItem } from "@mui/material";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { Collection } from "../../api/types";
+import { FC, MouseEventHandler } from "react";
+import { ListItemText, MenuItem as MuiMenuItem, styled } from "@mui/material";
 
-const DrawerItem: FC<{ collection: Collection }> = ({ collection }) => {
-  const navigate = useNavigate();
-  const { setItemToLocalStorage } = useLocalStorage();
+const DrawerItem: FC<{
+  text: string;
+  onClick: MouseEventHandler;
+}> = ({ text, onClick }) => (
+  <MenuItem onClick={onClick}>
+    <ListItemText primary={text} />
+  </MenuItem>
+);
 
-  const onDrawerItemClick = () => {
-    navigate(`/${collection.id}`);
-    setItemToLocalStorage("latestAccessedCollectionId", collection.id);
-  };
-
-  return (
-    <MenuItem onClick={() => onDrawerItemClick()}>
-      <ListItemText primary={collection.name} />
-    </MenuItem>
-  );
-};
+const MenuItem = styled(MuiMenuItem)`
+  border-radius: 4px;
+  width: 100%;
+`;
 
 export default DrawerItem;

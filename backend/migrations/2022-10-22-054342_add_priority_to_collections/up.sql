@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE collections
+ADD COLUMN priority INT NOT NULL DEFAULT 0;
+
+COMMIT;

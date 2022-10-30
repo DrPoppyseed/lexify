@@ -7,11 +7,15 @@ use rocket::{
     Response,
     State,
 };
+use rocket_firebase_auth::{
+    bearer_token::BearerToken,
+    errors::AuthError,
+    jwt::Jwt,
+};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
 use crate::{
-    auth::{AuthError, BearerToken, Jwt},
     db::StorageError,
     http_error::HttpError,
     rocket_launch::ServerState,
@@ -58,8 +62,8 @@ pub async fn get_uid_from_token(
     state: &State<ServerState>,
     token: &BearerToken,
 ) -> Result<String, AuthError> {
-    Jwt::verify(&token.0, &state.firebase_admin, &state.jwt_config.jwks_url)
-        .map_ok(|token| token.claims.sub)
+    Jwt::verify(&token.0, &state.auth)
+        .map_ok(|token| token.uid)
         .await
 }
 

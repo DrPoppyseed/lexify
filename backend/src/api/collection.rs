@@ -9,15 +9,10 @@ use rocket::{
     Route,
     State,
 };
+use rocket_firebase_auth::bearer_token::BearerToken;
 use tracing::{error, info};
 
-use crate::{
-    api,
-    auth::BearerToken,
-    db,
-    http_error::HttpError,
-    rocket_launch::ServerState,
-};
+use crate::{api, db, http_error::HttpError, rocket_launch::ServerState};
 
 pub fn routes() -> Vec<Route> {
     routes![

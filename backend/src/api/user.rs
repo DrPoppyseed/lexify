@@ -5,7 +5,6 @@ use tracing::error;
 
 use crate::{
     api,
-    api::ApiResponse,
     db,
     http_error::HttpError,
     rocket_launch::{DbPool, ServerState},
@@ -36,7 +35,7 @@ pub async fn create_user(
 pub async fn get_or_create_user(
     state: &State<ServerState>,
     user: Json<api::User>,
-) -> Result<ApiResponse<api::User>, HttpError> {
+) -> Result<api::ApiResponse<api::User>, HttpError> {
     db::User::get_user(&state.db_pool, user.id.clone())
         .and_then(|db_user| async {
             match db_user {
@@ -48,7 +47,7 @@ pub async fn get_or_create_user(
                 }
             }
         })
-        .map_ok(|(user, status)| ApiResponse {
+        .map_ok(|(user, status)| api::ApiResponse {
             json: Some(Json(api::User { id: user.id })),
             status,
         })

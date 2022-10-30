@@ -4,26 +4,23 @@ use diesel::{
     r2d2::{ConnectionManager, Pool, PooledConnection},
     MysqlConnection,
 };
-use dotenv;
+use dotenvy;
 use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, CorsOptions};
+use rocket_firebase_auth::firebase_auth::FirebaseAuth;
 
-use crate::{
-    api::{collection, user, vocab_word},
-    auth::{FirebaseConfig, JwtConfig},
-};
+use crate::api::{collection, user, vocab_word};
 
 pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
 pub type DbPooled = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 pub struct ServerState {
-    pub db_pool:        DbPool,
-    pub firebase_admin: FirebaseConfig,
-    pub jwt_config:     JwtConfig,
+    pub db_pool: DbPool,
+    pub auth:    FirebaseAuth,
 }
 
 pub fn establish_connection_pool(env_filename: &str) -> DbPool {
-    dotenv::from_filename(env_filename).ok();
+    dotenvy::from_filename(env_filename).ok();
 
     let database_url = env::var("DB_URL")
         .expect("Failed to retrieve environment value DB_URL.");

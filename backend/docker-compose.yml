@@ -7,6 +7,6 @@ services:
     ports:
       - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: lexify
       MYSQL_USR: root

@@ -1,8 +1,8 @@
-frontend_up:
-	cd frontend && pnpm dev
+web:
+	cd packages/web && pnpm vite
 
-backend_up:
-	cd backend && cargo watch -x run
+api:
+	cd packages/rocket-api && cargo watch -x run
 
 force_clean_all_containers:
 	docker ps -aq | xargs docker stop | xargs	docker rm

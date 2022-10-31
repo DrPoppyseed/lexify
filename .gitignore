@@ -1,10 +1,10 @@
 # Logs
-frontend/pnpm-debug.log*
+pnpm-debug.log*
 
 # Dev dependencies and build files
-frontend/node_modules
-frontend/build
-backend/target
+node_modules
+build
+target
 
 
 *.local
@@ -19,7 +19,5 @@ backend/target
 .env.*
 !.env.test
 
-backend/Rocket.toml
-
-frontend/.firebase
-frontend/stats.html
+.firebase
+stats.html

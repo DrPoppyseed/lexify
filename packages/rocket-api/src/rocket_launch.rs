@@ -7,7 +7,7 @@ use diesel::{
 use dotenvy;
 use rocket::{Build, Rocket};
 use rocket_cors::{AllowedOrigins, CorsOptions};
-use rocket_firebase_auth::firebase_auth::FirebaseAuth;
+use rocket_firebase_auth::auth::FirebaseAuth;
 
 use crate::api::{collection, user, vocab_word};
 

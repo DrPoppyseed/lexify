@@ -1,90 +1,33 @@
 use std::time::Duration;
 
 use diesel::{Connection, ExpressionMethods, QueryDsl, RunQueryDsl};
-use rocket::{
-    http::Status,
-    local::asynchronous::{Client, LocalResponse},
-};
+use rocket::http::Status;
 use serde::Serialize;
 use tokio::time::sleep;
 
 use lexify_api::{api, db};
 
-use crate::{
+use crate::common::{
+    calls::{
+        call_create_collection,
+        call_get_collection,
+        call_get_collections,
+        call_update_collection,
+        call_update_collections,
+    },
     mocks::mock_jwk_issuer,
-    utils::{auth_header, setup},
+    utils::setup,
+    COL_DESC,
+    COL_ID,
+    COL_NAME,
+    USER_ID,
 };
 
-static USER_ID: &str = "test_user_id";
-static COL_ID: &str = "test_collection_id";
-static COL_NAME: &str = "test_collection_name";
-static COL_DESC: &str = "test_collection_description";
+mod common;
 
 #[derive(Serialize)]
 pub struct TestJwks {
     jwks: Vec<String>,
-}
-
-pub async fn call_create_collection(client: &Client) -> LocalResponse {
-    let req_body = api::Collection {
-        id:          COL_ID.to_string(),
-        user_id:     USER_ID.to_string(),
-        name:        COL_NAME.to_string(),
-        description: Some(COL_DESC.to_string()),
-        priority:    0,
-    };
-
-    client
-        .post("/collections")
-        .header(auth_header(USER_ID))
-        .json(&req_body)
-        .dispatch()
-        .await
-}
-
-async fn call_get_collections(client: &Client) -> LocalResponse {
-    client
-        .get("/collections")
-        .header(auth_header(USER_ID))
-        .dispatch()
-        .await
-}
-
-async fn call_update_collection(client: &Client) -> LocalResponse {
-    let req_body = api::Collection {
-        id:          COL_ID.to_string(),
-        user_id:     USER_ID.to_string(),
-        name:        "updated test name".to_string(),
-        description: Some("updated test description".to_string()),
-        priority:    0,
-    };
-
-    client
-        .put(format!("/collections/{COL_ID}"))
-        .header(auth_header(USER_ID))
-        .json(&req_body)
-        .dispatch()
-        .await
-}
-
-async fn call_get_collection(client: &Client) -> LocalResponse {
-    client
-        .get(format!("/collections/{COL_ID}"))
-        .header(auth_header(USER_ID))
-        .dispatch()
-        .await
-}
-
-async fn call_update_collections(
-    client: &Client,
-    collections: Vec<api::Collection>,
-) -> LocalResponse {
-    client
-        .put("/collections")
-        .header(auth_header(USER_ID))
-        .json(&collections)
-        .dispatch()
-        .await
 }
 
 #[rocket::async_test]

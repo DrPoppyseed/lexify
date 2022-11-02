@@ -14,4 +14,5 @@ RUN cargo build --release --bin app
 FROM debian:bullseye-slim AS runtime
 WORKDIR app
 COPY --from=builder /app/target/release/app /usr/local/bin
+ENV PORT 8080
 ENTRYPOINT ["/usr/local/bin/app"]

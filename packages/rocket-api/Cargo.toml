@@ -16,7 +16,7 @@ serde = "1.0.138"
 serde_json = "1.0.82"
 futures = "0.3.21"
 tracing = "0.1.36"
-rocket_firebase_auth = "0.2.3"
+rocket_firebase_auth = "0.2.4"
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "54fae0701dffbe5df686465780218644ee3fae5f" }
 diesel = { version = "2.0.0-rc.1", features = ["r2d2", "mysql", "chrono"] }
 chrono = { version = "0.4", features = ["serde"] }

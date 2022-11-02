@@ -1,27 +1,11 @@
 use diesel::{connection::SimpleConnection, Connection, QueryDsl, RunQueryDsl};
-use rocket::{
-    http::{ContentType, Status},
-    local::asynchronous::{Client, LocalResponse},
-};
+use rocket::http::Status;
 
 use lexify_api::{api, db};
 
-use crate::utils::setup;
+use crate::common::{calls::call_get_or_create_user, utils::setup, USER_ID};
 
-static USER_ID: &str = "dummy_user_id";
-
-async fn call_get_or_create_user(client: &Client) -> LocalResponse {
-    let req_body = api::User {
-        id: USER_ID.to_string(),
-    };
-
-    let req = client
-        .post("/users")
-        .header(ContentType::JSON)
-        .json(&req_body);
-
-    req.dispatch().await
-}
+mod common;
 
 #[rocket::async_test]
 async fn create_user_happy_path() {

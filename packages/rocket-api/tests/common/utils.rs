@@ -1,7 +1,7 @@
 use diesel::connection::SimpleConnection;
 use once_cell::sync::Lazy;
 use rocket::{http::Header, local::asynchronous::Client};
-use rocket_firebase_auth::{firebase_auth::FirebaseAuth, jwt::Jwt};
+use rocket_firebase_auth::auth::FirebaseAuth;
 use wiremock::MockServer;
 
 use lexify_api::rocket_launch::{
@@ -56,7 +56,7 @@ async fn cleanup(db_pool: &DbPool) {
     )
     .expect("Failed to execute cleanup scripts for database");
 
-    let migration = tokio::fs::read_to_string("./migrations/migrate.sql")
+    let migration = tokio::fs::read_to_string("migrations/migrate.sql")
         .await
         .expect("Failed to read the migration file.");
 
@@ -65,6 +65,6 @@ async fn cleanup(db_pool: &DbPool) {
 }
 
 pub fn auth_header(user_id: &str) -> Header<'static> {
-    let token = Jwt::encode(user_id, &FIREBASE_AUTH).unwrap().0;
+    let token = &FIREBASE_AUTH.encode(user_id).unwrap().0;
     Header::new("Authorization", format!("Bearer {token}"))
 }

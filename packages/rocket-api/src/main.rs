@@ -1,5 +1,5 @@
 use rocket::{Build, Rocket};
-use rocket_firebase_auth::firebase_auth::FirebaseAuth;
+use rocket_firebase_auth::auth::FirebaseAuth;
 
 use lexify_api::rocket_launch::{
     establish_connection_pool,

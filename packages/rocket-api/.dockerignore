@@ -3,13 +3,14 @@ Dockerfile
 
 # unrelated files and directories
 migrations/
-how_i_solved_it.md
+tests/
 
 # builds and logs
 target/
 
 # environment
 .idea/
-.env
-Rocket.toml
+.env*
 rustfmt.toml
+
+service.yml

@@ -7,11 +7,7 @@ use rocket::{
     Response,
     State,
 };
-use rocket_firebase_auth::{
-    bearer_token::BearerToken,
-    errors::AuthError,
-    jwt::Jwt,
-};
+use rocket_firebase_auth::{bearer_token::BearerToken, errors::AuthError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
@@ -62,9 +58,7 @@ pub async fn get_uid_from_token(
     state: &State<ServerState>,
     token: &BearerToken,
 ) -> Result<String, AuthError> {
-    Jwt::verify(&token.0, &state.auth)
-        .map_ok(|token| token.uid)
-        .await
+    state.auth.verify(token).map_ok(|token| token.uid).await
 }
 
 impl<'r, T: serde::Serialize> response::Responder<'r, 'r> for ApiResponse<T> {

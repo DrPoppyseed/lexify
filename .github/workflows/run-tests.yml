@@ -11,13 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db: mysql:latest
-      env:
-        MYSQL_ROOT_PASSWORD: password
-        MYSQL_DATABASE: lexify
-        MYSQL_USR: root
-      ports:
-        - 5432:5432
+      db:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: lexify
+          MYSQL_USR: root
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v1

@@ -9,10 +9,10 @@ FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release --bin lexify-rocket-api
+RUN cargo build --release --bin lexify-core
 
 FROM debian:bullseye-slim AS runtime
 WORKDIR app
-COPY --from=builder /app/target/release/lexify-rocket-api /usr/local/bin
+COPY --from=builder /app/target/release/lexify-core /usr/local/bin
 ENV PORT 8080
-ENTRYPOINT ["/usr/local/bin/lexify-rocket-api"]
+ENTRYPOINT ["/usr/local/bin/lexify-core"]

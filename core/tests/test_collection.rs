@@ -5,7 +5,7 @@ use rocket::http::Status;
 use serde::Serialize;
 use tokio::time::sleep;
 
-use lexify_rocket_api::{api, db};
+use lexify_core::{api, db};
 
 use crate::common::{
     calls::{

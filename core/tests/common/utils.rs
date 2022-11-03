@@ -4,7 +4,7 @@ use rocket::{http::Header, local::asynchronous::Client};
 use rocket_firebase_auth::auth::FirebaseAuth;
 use wiremock::MockServer;
 
-use lexify_rocket_api::rocket_launch::{
+use lexify_core::rocket_launch::{
     establish_connection_pool,
     rocket_launch,
     DbPool,

@@ -23,21 +23,21 @@ Rocket(Rust) and mysql is used for a fast server.
 
 ## Testing
 
-Currently we only have integration tests for our API. To get started, first
+Currently, we only have integration tests for our API. To get started, first
 create the mysql instance by running docker compose.
 
 ```bash
-$ cd backed && docker-compose up
+$ cd lexify-rocket-api && docker-compose up -d
 ```
 
 Then, run the tests using cargo's testing or by using `nextest`. You might need
 to install `nextest` to your local environment if you haven't already.
 
 ```bash
-$ cargo nextest run -- --ignored
+$ cargo test --no-fail-fast -- --test-threads=1
 ```
 
 ## Running
 
-The frontend code can be run on localhost with `make frontend_up` and the backend
-similarly with `make backend_up`.
+The frontend code can be run on localhost with `make web` and the backend
+similarly with `make api`.

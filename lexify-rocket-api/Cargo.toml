@@ -1,5 +1,5 @@
 [package]
-name = "lexify-api"
+name = "lexify-rocket-api"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ path = "src/lib.rs"
 
 [[bin]]
 path = "src/main.rs"
-name = "lexify-api"
+name = "lexify-rocket-api"
 
 [dependencies]
 dotenvy = "0.15.6"

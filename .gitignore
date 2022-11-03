@@ -5,7 +5,7 @@ pnpm-debug.log*
 node_modules
 build
 target
-
+./Cargo.lock
 
 *.local
 

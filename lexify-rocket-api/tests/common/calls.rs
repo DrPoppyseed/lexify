@@ -3,7 +3,7 @@ use rocket::{
     local::asynchronous::{Client, LocalResponse},
 };
 
-use lexify_api::api;
+use lexify_rocket_api::api;
 
 use crate::common::{
     utils::auth_header,

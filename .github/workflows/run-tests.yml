@@ -1,0 +1,42 @@
+name: Run integration tests for Rust packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      db: mysql:latest
+      env:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: lexify
+        MYSQL_USR: root
+      ports:
+        - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: Clean workspace
+        uses: actions-rs/cargo@v1
+        with:
+          command: clean
+
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        env:
+          CARGO_INCREMENTAL: "0"
+        with:
+          command: test
+          args: --no-fail-fast -- --test-threads=1

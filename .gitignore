@@ -5,7 +5,8 @@ pnpm-debug.log*
 node_modules
 build
 target
-./Cargo.lock
+Cargo.lock
+!lexify-rocket-api/Cargo.lock
 
 *.local
 

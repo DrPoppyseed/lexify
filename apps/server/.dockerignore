@@ -10,7 +10,7 @@ target/
 
 # environment
 .idea/
-.env*
+../../.env.test
 rustfmt.toml
 
 service.yml

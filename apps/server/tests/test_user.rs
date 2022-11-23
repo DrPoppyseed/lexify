@@ -1,7 +1,7 @@
 use diesel::{connection::SimpleConnection, Connection, QueryDsl, RunQueryDsl};
 use rocket::http::Status;
 
-use lexify_core::{api, db};
+use lexify_server::{api, db};
 
 use crate::common::{calls::call_get_or_create_user, utils::setup, USER_ID};
 

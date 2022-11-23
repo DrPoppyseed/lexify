@@ -5,7 +5,7 @@ use rocket::http::Status;
 use tokio::time::sleep;
 
 use common::{mocks::mock_jwk_issuer, utils::setup};
-use lexify_core::{api, db};
+use lexify_server::{api, db};
 
 use crate::common::{
     calls::{

@@ -18,8 +18,8 @@ Cargo.lock
 .DS_Store
 
 .env
-.env.*
-!.env.test
+apps/server/.env.test
+!apps/server/.env.test
 
 .firebase
 stats.html

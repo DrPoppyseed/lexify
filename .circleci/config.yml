@@ -33,7 +33,7 @@ commands:
           command: cargo fmt -- --check
       - run:
           name: Check clippy
-          command: cargo clippy -- --allow warnings
+          command: cargo clippy --release -- --allow warnings
 
   install-nextest:
     steps:
@@ -109,9 +109,19 @@ commands:
 
 jobs:
   everything:
+    resource_class: medium
+    environment:
+      DB_URL: mysql://root:root@127.0.0.1:3306/lexify
     docker:
       - image: cimg/rust:1.65.0
       - image: cimg/mysql:8.0
+        environment:
+          DB_DATABASE: lexify
+          DB_USER: root
+          DB_PASSWORD: root
+        command: |
+          sudo /etc/init.d/mysql start
+          mysql -h127.0.0.1 -P3306 -p${DB_PASSWORD} -u${DB_USER} -e 'CREATE DATABASE ${DB_DATABASE}'
     steps:
       - checkout
       - install-system-deps

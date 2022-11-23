@@ -9,18 +9,12 @@ use lexify_server::{api, db};
 
 use crate::common::{
     calls::{
-        call_create_collection,
-        call_get_collection,
-        call_get_collections,
-        call_update_collection,
-        call_update_collections,
+        call_create_collection, call_get_collection, call_get_collections,
+        call_update_collection, call_update_collections,
     },
     mocks::mock_jwk_issuer,
     utils::setup,
-    COL_DESC,
-    COL_ID,
-    COL_NAME,
-    USER_ID,
+    COL_DESC, COL_ID, COL_NAME, USER_ID,
 };
 
 mod common;
@@ -68,11 +62,11 @@ async fn get_collections_happy_path() {
     let body = res.into_json::<Vec<api::Collection>>().await.unwrap();
 
     let desired_body = api::Collection {
-        id:          COL_ID.to_string(),
-        user_id:     USER_ID.to_string(),
-        name:        COL_NAME.to_string(),
+        id: COL_ID.to_string(),
+        user_id: USER_ID.to_string(),
+        name: COL_NAME.to_string(),
         description: Some(COL_DESC.to_string()),
-        priority:    0,
+        priority: 0,
     };
 
     assert_eq!(&body.len(), &1usize);
@@ -114,11 +108,11 @@ async fn get_collection_happy_path() {
     let res_body = res.into_json::<api::Collection>().await.unwrap();
 
     let desired_body = api::Collection {
-        id:          COL_ID.to_string(),
-        user_id:     USER_ID.to_string(),
-        name:        COL_NAME.to_string(),
+        id: COL_ID.to_string(),
+        user_id: USER_ID.to_string(),
+        name: COL_NAME.to_string(),
         description: Some(COL_DESC.to_string()),
-        priority:    0,
+        priority: 0,
     };
 
     assert_eq!(res_body, desired_body);
@@ -132,18 +126,18 @@ async fn update_collections_happy_path() {
 
     let collections = vec![
         api::Collection {
-            id:          COL_ID.to_string(),
-            user_id:     USER_ID.to_string(),
-            name:        COL_NAME.to_string(),
+            id: COL_ID.to_string(),
+            user_id: USER_ID.to_string(),
+            name: COL_NAME.to_string(),
             description: Some(COL_DESC.to_string()),
-            priority:    0,
+            priority: 0,
         },
         api::Collection {
-            id:          "another_col_id".to_string(),
-            user_id:     USER_ID.to_string(),
-            name:        "another_col_name".to_string(),
+            id: "another_col_id".to_string(),
+            user_id: USER_ID.to_string(),
+            name: "another_col_name".to_string(),
             description: Some("another_desc".to_string()),
-            priority:    1,
+            priority: 1,
         },
     ];
 

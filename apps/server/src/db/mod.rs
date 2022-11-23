@@ -12,7 +12,7 @@ pub mod vocab_word;
 #[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone)]
 #[diesel(table_name = users)]
 pub struct User {
-    pub id:         String,
+    pub id: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -20,13 +20,13 @@ pub struct User {
 #[derive(AsChangeset, Queryable, Insertable, Serialize, Deserialize, Debug)]
 #[diesel(table_name = collections)]
 pub struct Collection {
-    pub id:          String,
-    pub user_id:     String,
-    pub name:        String,
+    pub id: String,
+    pub user_id: String,
+    pub name: String,
     pub description: Option<String>,
-    pub created_at:  NaiveDateTime,
-    pub updated_at:  NaiveDateTime,
-    pub priority:    i32,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub priority: i32,
 }
 
 #[derive(
@@ -34,15 +34,15 @@ pub struct Collection {
 )]
 #[diesel(table_name = vocab_words)]
 pub struct VocabWord {
-    pub id:            String,
+    pub id: String,
     pub collection_id: String,
-    pub word:          String,
-    pub definition:    Option<String>,
-    pub fails:         i32,
-    pub successes:     i32,
-    pub created_at:    NaiveDateTime,
-    pub updated_at:    NaiveDateTime,
-    pub priority:      i32,
+    pub word: String,
+    pub definition: Option<String>,
+    pub fails: i32,
+    pub successes: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub priority: i32,
 }
 
 #[derive(Debug)]

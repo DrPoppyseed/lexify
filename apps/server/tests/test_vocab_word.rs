@@ -9,16 +9,10 @@ use lexify_server::{api, db};
 
 use crate::common::{
     calls::{
-        call_create_collection,
-        call_create_vocab_word,
-        call_get_vocab_words,
-        call_update_vocab_word,
-        call_update_vocab_words,
+        call_create_collection, call_create_vocab_word, call_get_vocab_words,
+        call_update_vocab_word, call_update_vocab_words,
     },
-    COL_ID,
-    VW_DEF,
-    VW_ID,
-    VW_WORD,
+    COL_ID, VW_DEF, VW_ID, VW_WORD,
 };
 
 mod common;
@@ -37,13 +31,13 @@ async fn get_vocab_words_happy_path() {
 
     let res_body = res.into_json::<Vec<api::VocabWord>>().await.unwrap();
     let _desired_body = vec![api::VocabWord {
-        id:            VW_ID.to_string(),
+        id: VW_ID.to_string(),
         collection_id: COL_ID.to_string(),
-        word:          VW_WORD.to_string(),
-        definition:    VW_DEF.to_string(),
-        fails:         0,
-        successes:     0,
-        priority:      1,
+        word: VW_WORD.to_string(),
+        definition: VW_DEF.to_string(),
+        fails: 0,
+        successes: 0,
+        priority: 1,
     }];
 
     assert!(matches!(res_body, _desired_body));
@@ -92,13 +86,13 @@ async fn update_vocab_word_happy_path() {
         .unwrap();
 
     let _desired_body = api::VocabWord {
-        id:            VW_ID.to_string(),
+        id: VW_ID.to_string(),
         collection_id: COL_ID.to_string(),
-        word:          "updated test word".to_string(),
-        definition:    VW_DEF.to_string(),
-        fails:         2,
-        successes:     3,
-        priority:      1,
+        word: "updated test word".to_string(),
+        definition: VW_DEF.to_string(),
+        fails: 2,
+        successes: 3,
+        priority: 1,
     };
 
     assert!(matches!(vocab_word_in_db, _desired_body));
@@ -112,22 +106,22 @@ async fn update_vocab_words_happy_path() {
 
     let vocab_words = vec![
         api::VocabWord {
-            id:            VW_ID.to_string(),
+            id: VW_ID.to_string(),
             collection_id: COL_ID.to_string(),
-            word:          VW_WORD.to_string(),
-            definition:    VW_DEF.to_string(),
-            fails:         2,
-            successes:     3,
-            priority:      1,
+            word: VW_WORD.to_string(),
+            definition: VW_DEF.to_string(),
+            fails: 2,
+            successes: 3,
+            priority: 1,
         },
         api::VocabWord {
-            id:            "another_test_id".to_string(),
+            id: "another_test_id".to_string(),
             collection_id: COL_ID.to_string(),
-            word:          "another_test_word".to_string(),
-            definition:    "another_test_def".to_string(),
-            fails:         0,
-            successes:     0,
-            priority:      1,
+            word: "another_test_word".to_string(),
+            definition: "another_test_def".to_string(),
+            fails: 0,
+            successes: 0,
+            priority: 1,
         },
     ];
 

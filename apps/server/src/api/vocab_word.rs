@@ -1,13 +1,6 @@
 use futures::TryFutureExt;
 use rocket::{
-    get,
-    http::Status,
-    post,
-    put,
-    routes,
-    serde::json::Json,
-    Route,
-    State,
+    get, http::Status, post, put, routes, serde::json::Json, Route, State,
 };
 use rocket_firebase_auth::bearer_token::BearerToken;
 use tracing::info;
@@ -49,18 +42,18 @@ pub async fn get_vocab_words(
             vocab_words
                 .into_iter()
                 .map(|vocab_word| api::VocabWord {
-                    id:            vocab_word.id,
+                    id: vocab_word.id,
                     collection_id: vocab_word.collection_id,
-                    word:          vocab_word.word,
-                    definition:    vocab_word.definition.unwrap_or_default(),
-                    fails:         vocab_word.fails,
-                    successes:     vocab_word.successes,
-                    priority:      vocab_word.priority,
+                    word: vocab_word.word,
+                    definition: vocab_word.definition.unwrap_or_default(),
+                    fails: vocab_word.fails,
+                    successes: vocab_word.successes,
+                    priority: vocab_word.priority,
                 })
                 .collect()
         })
         .map(|vocab_words| api::ApiResponse {
-            json:   Some(Json(vocab_words)),
+            json: Some(Json(vocab_words)),
             status: Status::Ok,
         })
         .map_err(HttpError::from)
@@ -81,7 +74,7 @@ pub async fn create_vocab_word(
 
     db::VocabWord::insert_vocab_word(&state.db_pool, vocab_word.0)
         .map(|vocab_word| api::ApiResponse {
-            json:   Some(Json(vocab_word)),
+            json: Some(Json(vocab_word)),
             status: Status::Created,
         })
         .map_err(HttpError::from)
@@ -101,7 +94,7 @@ pub async fn update_vocab_word(
 
     db::VocabWord::update_vocab_word(&state.db_pool, vocab_word.0)
         .map(|vocab_word| api::ApiResponse {
-            json:   Some(Json(vocab_word)),
+            json: Some(Json(vocab_word)),
             status: Status::Ok,
         })
         .map_err(HttpError::from)
@@ -131,7 +124,7 @@ pub async fn update_vocab_words(
             vocab_words.0,
         )
         .map(|vocab_words| api::ApiResponse {
-            json:   Some(Json(vocab_words)),
+            json: Some(Json(vocab_words)),
             status: Status::Ok,
         })
         .map_err(HttpError::from)

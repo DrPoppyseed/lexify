@@ -3,18 +3,14 @@ use rocket::{
     http::{ContentType, Status},
     response,
     serde::json::Json,
-    Request,
-    Response,
-    State,
+    Request, Response, State,
 };
 use rocket_firebase_auth::{bearer_token::BearerToken, errors::AuthError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
 use crate::{
-    db::StorageError,
-    http_error::HttpError,
-    rocket_launch::ServerState,
+    db::StorageError, http_error::HttpError, rocket_launch::ServerState,
 };
 
 pub mod collection;
@@ -28,29 +24,29 @@ pub struct User {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Collection {
-    pub id:          String,
+    pub id: String,
     #[serde(rename = "userId")]
-    pub user_id:     String,
-    pub name:        String,
+    pub user_id: String,
+    pub name: String,
     pub description: Option<String>,
-    pub priority:    i32,
+    pub priority: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct VocabWord {
-    pub id:            String,
+    pub id: String,
     #[serde(rename = "collectionId")]
     pub collection_id: String,
-    pub word:          String,
-    pub definition:    String,
-    pub fails:         i32,
-    pub successes:     i32,
-    pub priority:      i32,
+    pub word: String,
+    pub definition: String,
+    pub fails: i32,
+    pub successes: i32,
+    pub priority: i32,
 }
 
 #[derive(Debug)]
 pub struct ApiResponse<T> {
-    pub json:   Option<Json<T>>,
+    pub json: Option<Json<T>>,
     pub status: Status,
 }
 

@@ -5,10 +5,7 @@ use rocket_firebase_auth::auth::FirebaseAuth;
 use wiremock::MockServer;
 
 use lexify_server::rocket_launch::{
-    establish_connection_pool,
-    rocket_launch,
-    DbPool,
-    ServerState,
+    establish_connection_pool, rocket_launch, DbPool, ServerState,
 };
 
 pub static FIREBASE_AUTH: Lazy<FirebaseAuth> = Lazy::new(|| {

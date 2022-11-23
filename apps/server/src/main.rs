@@ -2,9 +2,7 @@ use rocket::{Build, Rocket};
 use rocket_firebase_auth::auth::FirebaseAuth;
 
 use lexify_server::rocket_launch::{
-    establish_connection_pool,
-    rocket_launch,
-    ServerState,
+    establish_connection_pool, rocket_launch, ServerState,
 };
 
 #[rocket::launch]

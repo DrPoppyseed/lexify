@@ -16,7 +16,7 @@ pub type DbPooled = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 pub struct ServerState {
     pub db_pool: DbPool,
-    pub auth:    FirebaseAuth,
+    pub auth: FirebaseAuth,
 }
 
 pub fn establish_connection_pool(env_filename: &str) -> DbPool {

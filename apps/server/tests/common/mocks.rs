@@ -2,8 +2,7 @@ use rocket_firebase_auth::jwk::{Jwk, KeysResponse};
 use serde_json::json;
 use wiremock::{
     matchers::{method, path},
-    Mock,
-    ResponseTemplate,
+    Mock, ResponseTemplate,
 };
 
 #[allow(dead_code)]

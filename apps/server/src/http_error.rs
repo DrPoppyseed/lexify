@@ -4,7 +4,7 @@ use rocket::{http::Status, response::Responder, Request, Response};
 
 #[derive(Clone, Debug)]
 pub struct HttpError {
-    pub body:   String,
+    pub body: String,
     pub status: Status,
 }
 
@@ -15,35 +15,35 @@ impl HttpError {
 
     pub fn bad_request() -> Self {
         HttpError {
-            body:   "Bad Request".to_string(),
+            body: "Bad Request".to_string(),
             status: Status::BadRequest,
         }
     }
 
     pub fn unauthorized() -> Self {
         HttpError {
-            body:   "Unauthorized".to_string(),
+            body: "Unauthorized".to_string(),
             status: Status::Unauthorized,
         }
     }
 
     pub fn forbidden() -> Self {
         HttpError {
-            body:   "Forbidden".to_string(),
+            body: "Forbidden".to_string(),
             status: Status::Forbidden,
         }
     }
 
     pub fn not_found() -> Self {
         HttpError {
-            body:   "Not Found".to_string(),
+            body: "Not Found".to_string(),
             status: Status::NotFound,
         }
     }
 
     pub fn internal_error() -> Self {
         HttpError {
-            body:   "Internal Server Error".to_string(),
+            body: "Internal Server Error".to_string(),
             status: Status::InternalServerError,
         }
     }

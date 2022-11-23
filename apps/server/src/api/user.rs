@@ -4,8 +4,7 @@ use rocket::{http::Status, post, routes, serde::json::Json, Route, State};
 use tracing::error;
 
 use crate::{
-    api,
-    db,
+    api, db,
     http_error::HttpError,
     rocket_launch::{DbPool, ServerState},
 };

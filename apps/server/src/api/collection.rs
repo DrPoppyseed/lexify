@@ -1,13 +1,6 @@
 use futures::TryFutureExt;
 use rocket::{
-    get,
-    http::Status,
-    post,
-    put,
-    routes,
-    serde::json::Json,
-    Route,
-    State,
+    get, http::Status, post, put, routes, serde::json::Json, Route, State,
 };
 use rocket_firebase_auth::bearer_token::BearerToken;
 use tracing::{error, info};
@@ -41,16 +34,16 @@ pub async fn get_collections(
             db_collections
                 .into_iter()
                 .map(|collection| api::Collection {
-                    id:          collection.id,
-                    user_id:     collection.user_id,
-                    name:        collection.name,
+                    id: collection.id,
+                    user_id: collection.user_id,
+                    name: collection.name,
                     description: collection.description,
-                    priority:    collection.priority,
+                    priority: collection.priority,
                 })
                 .collect()
         })
         .map(|api_collections| api::ApiResponse {
-            json:   Some(Json(api_collections)),
+            json: Some(Json(api_collections)),
             status: Status::Ok,
         })
         .map_err(|e| {
@@ -111,7 +104,7 @@ pub async fn update_collection(
                 })
         })
         .map_ok(|collection| api::ApiResponse {
-            json:   Some(Json(collection)),
+            json: Some(Json(collection)),
             status: Status::Ok,
         })
         .await
@@ -139,14 +132,14 @@ pub async fn get_collection(
         })
         .map_ok(|collection| {
             let collection = api::Collection {
-                id:          collection.id,
-                user_id:     collection.user_id,
-                name:        collection.name,
+                id: collection.id,
+                user_id: collection.user_id,
+                name: collection.name,
                 description: collection.description,
-                priority:    collection.priority,
+                priority: collection.priority,
             };
             api::ApiResponse {
-                json:   Some(Json(collection)),
+                json: Some(Json(collection)),
                 status: Status::Ok,
             }
         })
@@ -178,7 +171,7 @@ pub async fn update_collections(
                 collections.0.as_slice(),
             )
             .map(|collections| api::ApiResponse {
-                json:   Some(Json(collections)),
+                json: Some(Json(collections)),
                 status: Status::Ok,
             })
             .map_err(HttpError::from)

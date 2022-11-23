@@ -1,0 +1,131 @@
+version: 2.1
+
+parameters:
+  rust-version:
+    type: string
+    default: 1.65.0
+  cache-size:
+    type: string
+    default: "500M"
+
+commands:
+  install-system-deps:
+    steps:
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y wget
+
+  setup-rust:
+    steps:
+      - run:
+          name: Set rust version
+          command: rustup default <<pipeline.parameters.rust-version>>
+
+  run-linter:
+    steps:
+      - run:
+          name: Add rustfmt
+          command: rustup component add rustfmt clippy
+      - run:
+          name: Check fmt
+          command: cargo fmt -- --check
+      - run:
+          name: Check clippy
+          command: cargo clippy -- --allow warnings
+
+  install-nextest:
+    steps:
+      - run:
+          name: Install nextest
+          command: |
+            # install nextest's prebuilt binary from source
+            wget https://get.nexte.st/latest/linux
+            # unzip tar file and make callable with cargo
+            sudo tar xzf linux -C ${CARGO_HOME:-~/.cargo}/bin
+
+  run-tests:
+    steps:
+      - run:
+          name: Run tests
+          command: |
+            cargo nextest run --release --test-threads=1 --no-fail-fast --run-ignored=all --hide-progress-bar
+
+  build:
+    steps:
+      - run:
+          name: Build
+          command: cargo build --release --all
+
+  setup-sccache:
+    steps:
+      - run:
+          name: Install sccache
+          command: |
+            SCCACHE_VERSION=v0.3.1
+            TARGET_ARCH=x86_64-unknown-linux-musl
+            # cargo install sccache
+            wget https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET_ARCH}.tar.gz
+            tar xzf sccache-${SCCACHE_VERSION}-${TARGET_ARCH}.tar.gz
+            sudo mv sccache-${SCCACHE_VERSION}-${TARGET_ARCH}/sccache /usr/local/bin/sccache
+            sudo chmod +x /usr/local/bin/sccache
+            # Set rustc to use sccache
+            echo 'export "RUSTC_WRAPPER"="sccache"' >> $BASH_ENV
+            # Set the maximum amount of memory sccache can use
+            echo 'export "SCCACHE_CACHE_SIZE"="<<pipeline.parameters.cache-size>>"' >> $BASH_ENV
+            # Incremental compilation isn't supported by sccache
+            echo 'export "CARGO_INCREMENTAL"="0"' >> $BASH_ENV
+
+  sccache-stats:
+    steps:
+      - run:
+          name: Show sccache stats
+          command: |
+            sccache --version
+            sccache --show-stats
+
+  restore-sccache-cache:
+    steps:
+      - restore_cache:
+          name: Restore sccache cache
+          # We have multiple keys to increase the chance of a cache hit
+          # in case the Cargo.lock is updated, we still want to retrieve
+          # some cache
+          keys:
+            - sccache-cache-stable-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "Cargo.lock" }}
+            - sccache-cache-stable-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+            - sccache-cache-stable-{{ arch }}
+
+  save-sccache-cache:
+    steps:
+      - save_cache:
+          name: Save sccache cache
+          # We only upload a new cache if our Cargo.lock changed
+          # otherwise, we update the exact same key
+          key: sccache-cache-stable-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "Cargo.lock" }}
+          paths:
+            - "~/.cache/sccache"
+
+jobs:
+  everything:
+    docker:
+      - image: cimg/rust:1.65.0
+      - image: cimg/mysql:8.0
+    steps:
+      - checkout
+      - install-system-deps
+      - setup-sccache
+      - restore-sccache-cache
+      - setup-rust
+      - run-linter
+      - install-nextest
+      - run-tests
+      - build
+      - save-sccache-cache
+      - sccache-stats
+
+workflows:
+  everything:
+    jobs:
+      - everything

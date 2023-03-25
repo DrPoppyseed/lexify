@@ -1,0 +1,43 @@
+generator client {
+  provider     = "cargo prisma"
+  output       = "../apps/server/src/db.rs"
+  relationMode = "prisma"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model collections {
+  id          String   @id @db.VarChar(255)
+  user_id     String   @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @db.Timestamp(0)
+  priority    Int      @default(0)
+
+  @@index([user_id], map: "user_idx")
+}
+
+model users {
+  id         String   @id @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model vocab_words {
+  id            String   @id @db.VarChar(255)
+  collection_id String   @db.VarChar(255)
+  word          String   @db.VarChar(255)
+  definition    String?  @db.Text
+  fails         Int      @default(0)
+  successes     Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+  priority      Int      @default(0)
+
+  @@index([collection_id], map: "collection_idx")
+}

@@ -1,13 +1,14 @@
 import { AppBar, Grid, styled } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo } from "react";
-import Header from "../components/Header";
-import Drawer from "../components/Drawer/Drawer";
+import { useNavigate, useParams } from "react-router-dom";
+
 import CollectionEditor from "../components/CollectionEditor";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { useGetCollections } from "../hooks/useCollection";
+import Drawer from "../components/Drawer/Drawer";
+import Header from "../components/Header";
 import VocabCardsContainer from "../components/VocabCardsContainer";
 import { useAppState } from "../hooks/useAppState";
+import { useGetCollections } from "../hooks/useCollection";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const Home = () => {
   const { isDrawerOpen } = useAppState();
@@ -126,4 +127,5 @@ const BodyWrapper = styled("div", {
 const CollectionEditorWrapper = styled(Grid)`
   height: fit-content;
 `;
+
 export default Home;

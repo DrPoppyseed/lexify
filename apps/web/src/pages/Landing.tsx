@@ -1,43 +1,21 @@
-import { Grid, styled, Typography } from "@mui/material";
-import PreAuthHeader from "../components/PreAuthHeader";
 import CTAButton from "../components/CTAButton";
+import { PreAuthHeader } from "../components/PreAuthHeader";
 
 const Landing = () => (
-  <LandingBase container>
+  <div className="grid h-full w-full">
     <PreAuthHeader>
       <CTAButton />
     </PreAuthHeader>
 
-    <Title>
-      <Typography variant="h3">
+    <div className="absolute left-1/2 top-1/2 translate-x-1/2 translate-y-1/2 flex flex-col">
+      <h3 className="mb-2">
         <b>Want a digital vocabulary book?</b>
         <br /> We can help.
-      </Typography>
-      <Typography variant="h6">
-        Lexify is a dead simple vocabulary card builder.
-      </Typography>
+      </h3>
+      <h6 className="mb-2">Lexify is a dead simple vocabulary card builder.</h6>
       <CTAButton />
-    </Title>
-  </LandingBase>
+    </div>
+  </div>
 );
-
-const LandingBase = styled(Grid)`
-  height: 100%;
-  width: 100%;
-`;
-
-const Title = styled("div")`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-
-  & > h3,
-  & > h6 {
-    margin-bottom: ${({ theme }) => theme.spacing(4)};
-  }
-`;
 
 export default Landing;

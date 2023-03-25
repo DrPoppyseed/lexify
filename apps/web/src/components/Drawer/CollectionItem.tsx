@@ -1,14 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { FC, MouseEvent } from "react";
 import { CSS } from "@dnd-kit/utilities";
-import { MenuItem as MuiMenuItem, styled } from "@mui/material";
+import * as React from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 
-const CollectionItem: FC<{ id: string; name: string }> = ({ id, name }) => {
+export const CollectionItem: React.FC<{ id: string; name: string }> = ({
+  id,
+  name,
+}) => {
   const navigate = useNavigate();
   const { setItemToLocalStorage } = useLocalStorage();
-  const { attributes, listeners, setNodeRef, transform, transition, isOver } =
+  const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id,
     });
@@ -20,7 +23,8 @@ const CollectionItem: FC<{ id: string; name: string }> = ({ id, name }) => {
   };
 
   return (
-    <MenuItem
+    <button
+      className="br-2 w-full cursor-pointer active:touch-action-manipulation active:cursor-grabbing"
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -31,19 +35,6 @@ const CollectionItem: FC<{ id: string; name: string }> = ({ id, name }) => {
       {...listeners}
     >
       {name}
-    </MenuItem>
+    </button>
   );
 };
-
-const MenuItem = styled(MuiMenuItem)`
-  border-radius: 4px;
-  width: 100%;
-
-  cursor: pointer;
-  &:active {
-    touch-action: manipulation;
-    cursor: grabbing;
-  }
-`;
-
-export default CollectionItem;

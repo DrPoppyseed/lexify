@@ -1,19 +1,11 @@
-import { LinearProgress, styled, Typography } from "@mui/material";
+import * as React from "react";
 
 const Loading = () => (
   <div>
-    <LinearProgress />
-    <TextContainer>
-      <Typography variant="h6">Preparing your vocab words...</Typography>
-    </TextContainer>
+    <div className="left-1/2 top-1/2 absolute transform -translate-x-1/2 -translate-y-1/2">
+      <h6>Preparing your vocab words...</h6>
+    </div>
   </div>
 );
-
-const TextContainer = styled("div")`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-`;
 
 export default Loading;

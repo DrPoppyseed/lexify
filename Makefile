@@ -1,8 +1,8 @@
 web:
-	cd web && pnpm vite
+	cd apps/web && pnpm vite
 
-api:
-	cd lexify-rocket-api && cargo watch -x run
+server:
+	cd apps/server && cargo watch -x run
 
 test-api:
 	cargo test --no-fail-fast -- --test-threads=1

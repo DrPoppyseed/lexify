@@ -1,18 +1,12 @@
-import { FC, MouseEventHandler } from "react";
-import { ListItemText, MenuItem as MuiMenuItem, styled } from "@mui/material";
+import * as React from "react";
 
-const DrawerItem: FC<{
+const DrawerItem: React.FC<{
   text: string;
-  onClick: MouseEventHandler;
+  onClick: React.MouseEventHandler;
 }> = ({ text, onClick }) => (
-  <MenuItem onClick={onClick}>
-    <ListItemText primary={text} />
-  </MenuItem>
+  <div className="br-2 w-full" onClick={onClick}>
+    <p>{text}</p>
+  </div>
 );
-
-const MenuItem = styled(MuiMenuItem)`
-  border-radius: 4px;
-  width: 100%;
-`;
 
 export default DrawerItem;

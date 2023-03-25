@@ -1,6 +1,0 @@
-BEGIN;
-
-ALTER TABLE vocab_words
-ADD COLUMN priority INT DEFAULT 0;
-
-COMMIT;

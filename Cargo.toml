@@ -1,4 +1,11 @@
 [workspace]
-members = [
-  "apps/server"
-]
+resolver = "2"
+members = ["apps/server", "apps/server/prisma-cli"]
+
+[workspace.dependencies]
+prisma-client-rust = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.6", features = [
+  "mysql",
+] }
+prisma-client-rust-cli = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.6", features = [
+  "mysql",
+] }

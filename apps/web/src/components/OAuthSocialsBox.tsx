@@ -1,75 +1,37 @@
-import { ButtonBase, styled, Typography } from "@mui/material";
 import { GitHub, Google } from "@mui/icons-material";
-import { FC } from "react";
+import * as React from "react";
 import { Link } from "react-router-dom";
+
 import { useGithubOAuth, useGoogleOAuth } from "../hooks/useOAuth";
+import { Button } from "../primitives/Button";
 
-type AuthVariant = "Signup" | "Login";
-type Props = { variant: AuthVariant };
+export type AuthVariant = "SignUp" | "Login";
 
-const SignupLoginText: FC<Props> = ({ variant }) => {
-  const link = variant === "Signup" ? "login" : "signup";
-
-  return (
-    <SignupLoginTextBase>
-      Or <Link to={`/${link}`}>{link}</Link> if you{" "}
-      {variant === "Signup" && " don't "} have one.
-    </SignupLoginTextBase>
-  );
-};
-
-const OAuthSocialsBox: FC<Props> = ({ variant }) => {
+export const OAuthSocialsBox: React.FC<{ variant: AuthVariant }> = ({
+  variant,
+}) => {
   const githubOAuth = useGithubOAuth();
   const googleOAuth = useGoogleOAuth();
+  const link = variant === "SignUp" ? "login" : "signup";
 
   return (
-    <OAuthSocialsBoxBase>
-      <Typography variant="h3">
+    <div className="absolute left-1/2 top-1/2 translate-x-1/2 translate-y-1/2 flex flex-col items-center">
+      <h3 className="mb-2">
         <b>{variant}</b>
-      </Typography>
-      <FlatButton onClick={() => googleOAuth()}>
+      </h3>
+      <Button onClick={() => googleOAuth()}>
         <Google />
-        <Typography>{variant} with Google</Typography>
-      </FlatButton>
-      <FlatButton onClick={() => githubOAuth()}>
+        <p>{variant} with Google</p>
+      </Button>
+      <Button onClick={() => githubOAuth()}>
         <GitHub />
-        <Typography>{variant} with Github</Typography>
-      </FlatButton>
-      <SignupLoginText variant={variant} />
-    </OAuthSocialsBoxBase>
+        <p>{variant} with Github</p>
+      </Button>
+
+      <p className="mb-2">
+        Or <Link to={`/${link}`}>{link}</Link> if you
+        {variant === "SignUp" && " don't "} have one.
+      </p>
+    </div>
   );
 };
-
-const OAuthSocialsBoxBase = styled("div")`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  & > h3 {
-    margin-bottom: ${({ theme }) => theme.spacing(2)};
-  }
-`;
-
-const FlatButton = styled(ButtonBase)`
-  padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(3)}`};
-  width: ${({ theme }) => theme.spacing(36)};
-  border-radius: 3px;
-  background-color: #fff;
-  border: 1px solid rgba(15, 15, 15, 0.15);
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-
-  & > svg {
-    margin-right: ${({ theme }) => theme.spacing(1)};
-  }
-`;
-
-const SignupLoginTextBase = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)};
-`;
-
-export default OAuthSocialsBox;

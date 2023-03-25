@@ -1,22 +1,9 @@
-import { FC, useEffect, useState } from "react";
-import {
-  Divider,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  MenuItem as MuiMenuItem,
-  MenuList,
-  styled,
-  SwipeableDrawer,
-} from "@mui/material";
-import { Add, Menu } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import {
   Active,
-  closestCenter,
   DndContext,
   Over,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -24,15 +11,29 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import DrawerItem from "./DrawerItem";
+import { Add, Menu } from "@mui/icons-material";
+import {
+  Divider,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  MenuList,
+  MenuItem as MuiMenuItem,
+  SwipeableDrawer,
+  styled,
+} from "@mui/material";
+import { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { Collection } from "../../api/types";
+import { useAppState } from "../../hooks/useAppState";
 import {
   useCreateCollection,
   useUpdateCollections,
 } from "../../hooks/useCollection";
-import { Collection } from "../../api/types";
-import { useAppState } from "../../hooks/useAppState";
 import { moveInPlace } from "../../utils";
-import CollectionItem from "./CollectionItem";
+import { CollectionItem } from "./CollectionItem";
+import DrawerItem from "./DrawerItem";
 
 const activationConstraint = {
   delay: 150,

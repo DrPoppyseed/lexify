@@ -1,14 +1,15 @@
-import { useEffect } from "react";
+import * as React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import PreAuthHeader from "../components/PreAuthHeader";
-import OAuthSocialsBox from "../components/OAuthSocialsBox";
 
-const Signup = () => {
+import { OAuthSocialsBox } from "../components/OAuthSocialsBox";
+import { PreAuthHeader } from "../components/PreAuthHeader";
+import { useAuth } from "../hooks/useAuth";
+
+const SignUp = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       navigate("/");
     }
@@ -17,9 +18,9 @@ const Signup = () => {
   return (
     <div>
       <PreAuthHeader />
-      <OAuthSocialsBox variant="Signup" />
+      <OAuthSocialsBox variant="SignUp" />
     </div>
   );
 };
 
-export default Signup;
+export default SignUp;
